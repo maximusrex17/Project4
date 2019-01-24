@@ -1,0 +1,2 @@
+Unable to load material library
+Unable to read material "orig_02_-_Default" in .mtl file
