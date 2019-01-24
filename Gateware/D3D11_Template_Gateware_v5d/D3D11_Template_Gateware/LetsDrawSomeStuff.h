@@ -578,11 +578,6 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	}
 }
 
-float UpdateDeg(float time, float deg) {
-	float newDeg = deg + time;
-	return newDeg;
-}
-
 // Draw
 void LetsDrawSomeStuff::Render()
 {
@@ -646,7 +641,7 @@ void LetsDrawSomeStuff::Render()
 			XMFLOAT4 SunColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 			//Earth Position
-			XMFLOAT4 EarthPos = { 0.0f, 0.0f, 0.0f, 1.0f };
+			XMFLOAT4 EarthPos = { 1.0f, 0.0f, 0.0f, 1.0f };
 			//Earth Color
 			XMFLOAT4 EarthColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -665,15 +660,16 @@ void LetsDrawSomeStuff::Render()
 			XMStoreFloat4x4(&viewfloat, viewMatrix);
 			viewMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
 
+			//Enter Key: Reset Camera
+			if (GetAsyncKeyState(VK_RETURN)) {
+				viewMatrix = ReturnViewMatrix;
+			}
+
 			XMMATRIX RotateLight = XMMatrixRotationY(-curDeg);
 			XMVECTOR LightVec = XMLoadFloat4(&SunDir);
 			LightVec = XMVector3Transform(LightVec, RotateLight);
 			XMStoreFloat4(&SunDir, LightVec);
 
-			//Enter Key: Reset Camera
-			if (GetAsyncKeyState(VK_RETURN)) {
-				viewMatrix = ReturnViewMatrix;
-			}
 
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your Vertex & index buffers, Set your InputLayout & Topology & Draw!
@@ -708,14 +704,13 @@ void LetsDrawSomeStuff::Render()
 		//TODO: Render Earth
 
 			//earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
-
-
 			
-			XMMATRIX shipMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
+			shipMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
 			XMMATRIX shipScale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
 			shipMatrix = shipScale * shipMatrix;
 			
-			constBuff.cWorld = XMMatrixTranspose(shipMatrix);
+
+			constBuff.cWorld = XMMatrixTranspose(shipMatrix * XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f)));
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetShader(myVertexLightShader, nullptr, 0);

@@ -51,6 +51,8 @@ XMMATRIX worldMatrix;
 XMMATRIX viewMatrix;
 XMMATRIX projectionMatrix;
 XMMATRIX ReturnViewMatrix;
+XMMATRIX shipMatrix;
+XMMATRIX moonMatrix;
 XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
@@ -58,6 +60,9 @@ XMFLOAT4 OutputColor;
 float ratio;
 float oldRatio;
 
+POINT point = { 0,0 };
+LPPOINT p = { &point }, q = { &point };
 
 
-float timeSpent = 0, curDeg = 0;
+
+float timeSpent = 0, curDeg = 0, moveDeg = 0;
