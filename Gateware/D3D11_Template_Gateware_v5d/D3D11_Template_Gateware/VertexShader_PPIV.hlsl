@@ -27,6 +27,7 @@ struct OutputVertex {
 	float4 pos : SV_POSITION; // System Value
 	float2 uv : UV;
 	float3 norm : NORMAL;
+	float4 wPos : WORLDPOS;
 };
 
 
@@ -35,6 +36,7 @@ OutputVertex main(InputVertex input)
 {
 	OutputVertex output = (OutputVertex)0;
 	output.pos = mul(input.pos, vsWorld);
+	output.wPos = output.pos;
 	output.pos = mul(output.pos, vsView);
 	output.pos = mul(output.pos, vsProjection);
 	output.norm = normalize(mul(float4(input.norm, 0), vsWorld).xyz);

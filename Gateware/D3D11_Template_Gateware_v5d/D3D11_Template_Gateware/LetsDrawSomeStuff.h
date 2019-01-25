@@ -28,7 +28,10 @@ class LetsDrawSomeStuff
 	
 	//Matricies
 
-	ID3D11ShaderResourceView* myShaderResource = nullptr;
+	ID3D11ShaderResourceView* earthShaderResource = nullptr;
+	ID3D11ShaderResourceView* sunShaderResource = nullptr;
+	ID3D11ShaderResourceView* moonShaderResource = nullptr;
+	ID3D11ShaderResourceView* shipShaderResource = nullptr;
 	ID3D11SamplerState* mySampler = nullptr;
 	
 	
@@ -423,10 +426,10 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			myDevice->CreatePixelShader(LightPixelShader_PPIV, sizeof(LightPixelShader_PPIV), nullptr, &myLightPixelShader);
 
 
-			//Load in Earth model
+			//Load in Planet model
 
 			// Change the following filename to a suitable filename value.
-			const char* lFilename = "Assets/spaceCraft.fbx";
+			const char* lFilename = "Assets/planet.fbx";
 
 			// Initialize the SDK manager. This object handles memory management.
 			FbxManager* lSdkManager = FbxManager::Create();
@@ -454,8 +457,40 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			lImporter->Destroy();
 
 			// Process the scene and build DirectX Arrays
-			ProcessFbxMesh(lScene->GetRootNode(), Earth, earthIndicies);
+			ProcessFbxMesh(lScene->GetRootNode(), Planet, planetIndicies);
 
+			//Load in Planet model
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "Assets/spaceCraft.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), Ship, shipIndicies);
 			
 
 			//Create Input Layout
@@ -473,41 +508,41 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			ZeroMemory(&bDesc, sizeof(bDesc));
 			ZeroMemory(&subData, sizeof(subData));
 
-			//Vertex Buffer
+			//Vertex Planet Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
-			bDesc.ByteWidth = sizeof(Vertex) * Earth.size();
+			bDesc.ByteWidth = sizeof(Vertex) * Planet.size();
 			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			bDesc.CPUAccessFlags = 0;
 			bDesc.MiscFlags = 0;
 			bDesc.StructureByteStride = 0;
-			subData.pSysMem = Earth.data();
+			subData.pSysMem = Planet.data();
 			hr = myDevice->CreateBuffer(&bDesc, &subData, &myVertexBuffer);
 
-			//Vertex Sun Buffer
-			//bDesc.Usage = D3D11_USAGE_DEFAULT;
-			//bDesc.ByteWidth = sizeof(Vertex) * Sun.size();
-			//bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			//bDesc.CPUAccessFlags = 0;
-			//bDesc.MiscFlags = 0;
-			//bDesc.StructureByteStride = 0;
-			//subData.pSysMem = Sun.data();
-			//hr = myDevice->CreateBuffer(&bDesc, &subData, &myVertexLightBuffer);
-
-			//Index Buffer
+			//Index Planet Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
-			bDesc.ByteWidth = sizeof(unsigned int) * earthIndicies.size();
+			bDesc.ByteWidth = sizeof(unsigned int) * planetIndicies.size();
 			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			bDesc.CPUAccessFlags = 0;
-			subData.pSysMem = earthIndicies.data();
+			subData.pSysMem = planetIndicies.data();
 			myDevice->CreateBuffer(&bDesc, &subData, &myIndexBuffer);
 
-			//Index Buffer
-			//bDesc.Usage = D3D11_USAGE_DEFAULT;
-			//bDesc.ByteWidth = sizeof(unsigned int) * sunIndicies.size();
-			//bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-			//bDesc.CPUAccessFlags = 0;
-			//subData.pSysMem = sunIndicies.data();
-			//myDevice->CreateBuffer(&bDesc, &subData, &myIndexLightBuffer);
+			//Vertex Ship Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * Ship.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = Ship.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &myVertexLightBuffer);
+
+			//Index Ship Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * shipIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = shipIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &myIndexLightBuffer);
 
 			//Constant Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -516,7 +551,10 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			bDesc.CPUAccessFlags = 0;
 			hr = myDevice->CreateBuffer(&bDesc, nullptr, &myConstantBuffer);
 
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/spaceShipTexture.dds", nullptr, &myShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/sunTexture.dds", nullptr, &sunShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonTexture.dds", nullptr, &moonShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/spaceShipTexture.dds", nullptr, &shipShaderResource);
 
 			// Create the sample state
 			D3D11_SAMPLER_DESC sampDesc = {};
@@ -533,11 +571,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			worldMatrix = XMMatrixIdentity();
 
 			//View Matrices
-			XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -10.0f, 0.0f);
-			XMVECTOR Focus = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 			viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
-
+			ReturnViewMatrix = viewMatrix;
 
 			//Projection Matrix
 			projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), ratio, 0.1f, 100.0f);
@@ -560,11 +595,12 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myPixelShader->Release();
 	myLightPixelShader->Release();
 	myVertexBuffer->Release();
-	//myVertexLightBuffer->Release();
 	myIndexBuffer->Release();
-	//myIndexLightBuffer->Release();
 	myConstantBuffer->Release();
-	myShaderResource->Release();
+	earthShaderResource->Release();
+	sunShaderResource->Release();
+	moonShaderResource->Release();
+	shipShaderResource->Release();
 	mySampler->Release();
 
 	// TODO: "Release()" more stuff here!
@@ -581,8 +617,6 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 // Draw
 void LetsDrawSomeStuff::Render()
 {
-	oldRatio = ratio;
-
 	if (mySurface) // valid?
 	{		
 
@@ -634,19 +668,19 @@ void LetsDrawSomeStuff::Render()
 			////////////////////////////////////////////
 
 			//Sun Position
-			XMFLOAT4 SunPos = { -0.5f, 0.0f, 0.0f, 1.0f };
+			XMFLOAT4 SunPos = { 0.0f, 0.0f, 0.0f, 1.0f };
 			//Sun Direction (Directional Light)
 			XMFLOAT4 SunDir = { 0.0f, 0.0f, 1.0f, 1.0f };
 			//Sun Color
 			XMFLOAT4 SunColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 			//Earth Position
-			XMFLOAT4 EarthPos = { 1.0f, 0.0f, 0.0f, 1.0f };
+			XMFLOAT4 EarthPos = { 10.0f, 0.0f, 0.0f, 1.0f };
 			//Earth Color
 			XMFLOAT4 EarthColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 			//Earth Position
-			XMFLOAT4 MoonPos = { 0.8f, 0.0f, 0.0f, 1.0f };
+			XMFLOAT4 MoonPos = { 9.98f, 0.0f, 0.0f, 1.0f };
 			//Earth Color
 			XMFLOAT4 MoonColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -698,52 +732,92 @@ void LetsDrawSomeStuff::Render()
 			constBuff.cLightPos = SunPos;
 			constBuff.cLightDir = SunDir;
 			constBuff.cLightColor = SunColor;
-			constBuff.cOutputColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+		//TODO: Render Sun
+			
+			//Positioning and Scaling
+			sunMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&SunPos));
+			XMMATRIX sunScale = XMMatrixScaling(1.5f, 1.5f, 1.5f);
+			sunMatrix = sunScale * sunMatrix;
+
+			//Set Vertex Shader and Vertex Constant Buffer
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->PSSetShader(myPixelShader, nullptr, 0);
+			myContext->PSSetShaderResources(0, 1, &sunShaderResource);
+			myContext->PSSetSamplers(0, 1, &mySampler);
+
+			//Draw Sun
+			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render Earth
 
-			//earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
+			//Orbiting
+			XMMATRIX earthOrbit = XMMatrixRotationY(-curDeg);
+			XMVECTOR earthOrbitVec = XMLoadFloat4(&EarthPos);
+			earthOrbitVec = XMVector3Transform(earthOrbitVec, earthOrbit);
+			XMStoreFloat4(&EarthPos, earthOrbitVec);
 			
-			shipMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
-			XMMATRIX shipScale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-			shipMatrix = shipScale * shipMatrix;
+			//Postioning and Scaling
+			earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
 			
-
-			constBuff.cWorld = XMMatrixTranspose(shipMatrix * XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f)));
+			//Change Constant Buffer
+			constBuff.cWorld = XMMatrixTranspose(earthMatrix * XMMatrixRotationY(-curDeg));
 
 			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetShader(myVertexLightShader, nullptr, 0);
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShader(myVertexShader, nullptr, 0);
 
+			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-
+			
 			//Set Pixel Shader and Pixel Constant Buffer
 			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &myShaderResource);
+			myContext->PSSetShader(myPixelShader, nullptr, 0);
+			myContext->PSSetShaderResources(0, 1, &earthShaderResource);
 			myContext->PSSetSamplers(0, 1, &mySampler);
 
 			//Draw Earth
-			myContext->DrawIndexed(earthIndicies.size(), 0, 0);
+			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render the Moon
-			
-			XMMATRIX RotateMoon = XMMatrixRotationY(-curDeg);
+
+			//Orbiting
 			XMVECTOR MoonVec = XMLoadFloat4(&MoonPos);
+			XMMATRIX RotateMoon = XMMatrixRotationAxis(earthOrbitVec, curDeg);
 			MoonVec = XMVector3Transform(MoonVec, RotateMoon);
 			XMStoreFloat4(&MoonPos, MoonVec);
+			
+			//Positioning and Scaling
+			moonMatrix = XMMatrixTranslationFromVector(2.0f * XMLoadFloat4(&MoonPos));
+			XMMATRIX moonScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+			moonMatrix = moonScale * moonMatrix;
 
-			XMMATRIX mLight = XMMatrixTranslationFromVector(5.0f * XMLoadFloat4(&MoonPos));
-			XMMATRIX mLightScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
-			mLight = mLightScale * mLight;
+			//Rotate Around Axis
+			
+			//Change Constant Buffer
+			constBuff.cWorld = XMMatrixTranspose(moonMatrix);
 
-			// Update the world variable to reflect the current light
-			constBuff.cWorld = XMMatrixTranspose(mLight);
+			//Set Vertex Shader and Vertex Constant Buffer
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+			
+			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
+			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->PSSetShader(myPixelShader, nullptr, 0);
+			myContext->PSSetShaderResources(0, 1, &moonShaderResource);
+			myContext->PSSetSamplers(0, 1, &mySampler);
 
-			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
-			myContext->DrawIndexed(earthIndicies.size(), 0, 0);
+			//Draw Moon
+			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 			mySwapChain->Present(0, 0); // set first argument to 1 to enable vertical refresh sync with display
 

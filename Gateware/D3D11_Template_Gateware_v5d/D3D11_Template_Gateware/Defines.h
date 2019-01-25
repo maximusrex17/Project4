@@ -41,28 +41,36 @@ struct ConstantBuffer
 };
 
 //Vectors for Objects
-vector<Vertex> Earth;
-vector<unsigned  int> earthIndicies;
+vector<Vertex> Planet;
+vector<unsigned  int> planetIndicies;
 
-vector<Vertex> Sun;
-vector<unsigned  int> sunIndicies;
+vector<Vertex> Ship;
+vector<unsigned  int> shipIndicies;
+
 
 XMMATRIX worldMatrix;
 XMMATRIX viewMatrix;
 XMMATRIX projectionMatrix;
 XMMATRIX ReturnViewMatrix;
 XMMATRIX shipMatrix;
+XMMATRIX earthMatrix;
 XMMATRIX moonMatrix;
+XMMATRIX sunMatrix;
 XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
 
+XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -10.0f, 0.0f);
+XMVECTOR Focus = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
 float ratio;
 float oldRatio;
+
 
 POINT point = { 0,0 };
 LPPOINT p = { &point }, q = { &point };
 
 
 
-float timeSpent = 0, curDeg = 0, moveDeg = 0;
+float timeSpent = 0, curDeg = 0, posX = 0, posY = 0;

@@ -66,8 +66,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\test.FBX" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\test.FBX" />
+    <None Include="Assets\planet.fbx" />
   </ItemGroup>
 </Project>

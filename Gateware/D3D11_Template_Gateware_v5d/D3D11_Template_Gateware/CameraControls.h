@@ -1,7 +1,7 @@
 #pragma once
 #include "Defines.h"
 
-XMFLOAT4X4 MoveCamera(XMFLOAT4X4 view4x4, float posX, float posY) {
+XMFLOAT4X4 MoveCamera(XMFLOAT4X4 view4x4) {
 	//TODO: Add Camera Controls 'W' 'A' 'S' 'D' 'Up Arrow' 'Down Arrow' 'Left Arrow' 'Right Arrow'
 
 	GetCursorPos(p);
@@ -32,16 +32,31 @@ XMFLOAT4X4 MoveCamera(XMFLOAT4X4 view4x4, float posX, float posY) {
 		XMStoreFloat4x4(&newView, view);
 	}
 
-	if (p->y < 0) {
-		view *= XMMatrixRotationX((0 - p->y)-0);
-		XMStoreFloat4x4(&newView, view);
-	}
+	if (GetAsyncKeyState(VK_SHIFT)) {
+		if (p->y < posY) {
+			posY = p->y;
+			view *= XMMatrixRotationX(0.005);
+			XMStoreFloat4x4(&newView, view);
+		}
 
-	if (p->y > 0) {
-		view *= XMMatrixRotationX((0 + p->y)/100);
-		XMStoreFloat4x4(&newView, view);
-	}
+		if (p->y > posY) {
+			posY = p->y;
+			view *= XMMatrixRotationX(-0.005f);
+			XMStoreFloat4x4(&newView, view);
+		}
 
+		if (p->x < posX) {
+			posX = p->x;
+			view *= XMMatrixRotationY(0.005);
+			XMStoreFloat4x4(&newView, view);
+		}
+
+		if (p->x > posX) {
+			posX = p->x;
+			view *= XMMatrixRotationY(-0.005f);
+			XMStoreFloat4x4(&newView, view);
+		}
+	}
 
 	//Q Key: Rise
 	if (GetAsyncKeyState('Q')) {
@@ -55,17 +70,6 @@ XMFLOAT4X4 MoveCamera(XMFLOAT4X4 view4x4, float posX, float posY) {
 		XMStoreFloat4x4(&newView, view);
 	}
 
-	//Left Arrow Key: Rotate Left
-	if (GetAsyncKeyState(VK_LEFT)) {
-		view *= XMMatrixRotationY(moveDeg);
-		XMStoreFloat4x4(&newView, view);
-	}
-
-	//Right Arrow Key: Rotate Right
-	if (GetAsyncKeyState(VK_RIGHT)) {
-		view *= XMMatrixRotationY(-0.001f);
-		XMStoreFloat4x4(&newView, view);
-	}
 	XMStoreFloat4x4(&newView, view);
 	return newView;
 }
