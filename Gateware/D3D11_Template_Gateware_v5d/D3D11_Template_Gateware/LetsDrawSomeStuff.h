@@ -28,6 +28,7 @@ class LetsDrawSomeStuff
 	
 	//Matricies
 
+	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
 	ID3D11ShaderResourceView* earthShaderResource = nullptr;
 	ID3D11ShaderResourceView* sunShaderResource = nullptr;
 	ID3D11ShaderResourceView* moonShaderResource = nullptr;
@@ -767,7 +768,7 @@ void LetsDrawSomeStuff::Render()
 			earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
 			
 			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(earthMatrix * XMMatrixRotationY(-curDeg));
+			constBuff.cWorld = XMMatrixTranspose(earthMatrix);
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
@@ -789,24 +790,26 @@ void LetsDrawSomeStuff::Render()
 
 			//Orbiting
 			XMVECTOR MoonVec = XMLoadFloat4(&MoonPos);
-			XMMATRIX RotateMoon = XMMatrixRotationAxis(earthOrbitVec, curDeg);
+			XMVECTOR newEarthVec = XMLoadFloat4(&EarthPos);
+			XMMATRIX RotateMoon = XMMatrixRotationY(-2.0f * curDeg);
 			MoonVec = XMVector3Transform(MoonVec, RotateMoon);
 			XMStoreFloat4(&MoonPos, MoonVec);
 			
 			//Positioning and Scaling
-			moonMatrix = XMMatrixTranslationFromVector(2.0f * XMLoadFloat4(&MoonPos));
+			moonMatrix = XMMatrixTranslationFromVector(1.5f * XMLoadFloat4(&MoonPos));
 			XMMATRIX moonScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
-			moonMatrix = moonScale * moonMatrix;
+			moonMatrix *= moonScale;
 
+			moonMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
 			//Rotate Around Axis
 			
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(moonMatrix);
-
+			
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
-
+			
 			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 			
@@ -815,7 +818,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->PSSetShader(myPixelShader, nullptr, 0);
 			myContext->PSSetShaderResources(0, 1, &moonShaderResource);
 			myContext->PSSetSamplers(0, 1, &mySampler);
-
+			
 			//Draw Moon
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
