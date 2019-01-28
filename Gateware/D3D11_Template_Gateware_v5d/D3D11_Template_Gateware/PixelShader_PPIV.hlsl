@@ -30,7 +30,7 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
 	lightDir = normalize(vsLightPos - InputPixel.wPos);
 	lightRatio = saturate(dot(lightDir.xyz, InputPixel.norm));
-	lightRatio = saturate(lightRatio + 0.3f);
+	//lightRatio = saturate(lightRatio + 0.3f);
 	finalColor = (lightRatio * vsLightColor * surfaceColor);
 
 	return finalColor;

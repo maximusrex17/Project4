@@ -55,12 +55,13 @@ XMMATRIX ReturnViewMatrix;
 XMMATRIX shipMatrix;
 XMMATRIX earthMatrix;
 XMMATRIX moonMatrix;
+XMMATRIX marsMatrix;
 XMMATRIX sunMatrix;
 XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
 
-XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -10.0f, 0.0f);
+XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -15.0f, 0.0f);
 XMVECTOR Focus = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 

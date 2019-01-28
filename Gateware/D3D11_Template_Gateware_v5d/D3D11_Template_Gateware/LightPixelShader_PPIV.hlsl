@@ -16,16 +16,22 @@ struct OutputVertex {
 	float4 pos : SV_POSITION; // System Value
 	float2 uv : UV;
 	float3 norm : NORMAL;
+	float4 wPos : WORLDPOS;
 };
 
 float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 {
-	float4 finalColor = float4(0,0,0,0);
+	float4 finalColor = 0;
 
-	//Directional Light
-	finalColor = txDiffuse.Sample(samLinear, InputPixel.uv);	
-	float dotResult = saturate(dot(-vsLightDir.xyz, normalize(InputPixel.norm)));
-	finalColor = saturate(finalColor * dotResult);
+	float4 lightDir = 0;
+	float4 lightRatio = 0;
+	float4 surfaceColor = 0;
+
+	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
+	lightDir = normalize(vsLightPos - InputPixel.wPos);
+	lightRatio = saturate(dot(lightDir.xyz, InputPixel.norm));
+	lightRatio = saturate(lightRatio + 1.0f);
+	finalColor = (lightRatio * vsLightColor * surfaceColor);
 
 	return finalColor;
 }
