@@ -30,7 +30,8 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 
 	float4 pointLightDir = 0;
 	float4 spotLightDir = 0;
-	float4 lightRatio = 0;
+	float4 pointLightRatio = 0;
+	float4 spotLightRatio = 0;
 	float4 surfaceColor = 0;
 	float4 spotFactor = 0;
 	float4 surfaceRatio = 0;
@@ -40,14 +41,15 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 	//Point Light
 	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
 	pointLightDir = normalize(vsLightPos - InputPixel.wPos);
-	lightRatio = saturate(dot(pointLightDir.xyz, InputPixel.norm));	
-	pointFinalColor = (lightRatio * vsLightColor * surfaceColor);
+	pointLightRatio = saturate(dot(pointLightDir.xyz, InputPixel.norm));	
+	pointFinalColor = (pointLightRatio * vsLightColor * surfaceColor);
 
 	//SpotLight
 	spotLightDir = normalize(vsLightPos1 - InputPixel.wPos);
 	surfaceRatio = saturate(dot(-spotLightDir.xyz, vsLightDir1));
+	spotLightRatio = normalize(vsLightPos1 - InputPixel.wPos);
 	spotFactor = (surfaceRatio > coneRatio) ? 1 : 0;
-	spotFinalColor = (spotFactor * lightRatio * vsLightColor1 * surfaceColor);
+	spotFinalColor = (spotFactor * spotLightRatio * vsLightColor1 * surfaceColor);
 	finalColor = pointFinalColor + spotFinalColor;
 
 	return finalColor;

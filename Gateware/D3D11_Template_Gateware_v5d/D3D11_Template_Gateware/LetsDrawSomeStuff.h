@@ -751,11 +751,11 @@ void LetsDrawSomeStuff::Render()
 			XMFLOAT4 ShipColor = { 0.0f, 1.0f, 1.0f, 1.0f };
 
 			//Spot Position
-			XMFLOAT4 SpotPos = { 15.0f, 0.0f, 1.0f, 1.0f };
+			XMFLOAT4 SpotPos = { 0.0f, 0.0f, 100.0f, 1.0f };
 			//Spot Color
-			XMFLOAT4 SpotColor = { 1.0f, 0.0f, 1.0f, 0.5f };
+			XMFLOAT4 SpotColor = { 1.0f, 0.0f, 1.0f, 1.0f };
 			//Sun Direction (Directional Light)
-			XMFLOAT4 SpotDir = { 5.0f, 0.0f, 1.0f, 1.0f };
+			XMFLOAT4 SpotDir = { 5.0f, 0.0f, -1.0f, 1.0f };
 
 			//Tilt the Earth
 
@@ -846,6 +846,51 @@ void LetsDrawSomeStuff::Render()
 				copyWorld = worldMatrix;
 				copyWorld = copyWorld * tempWorld;
 			}
+
+			if (GetAsyncKeyState('Q')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(0.0f, 0.01f, 0.0f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+
+			if (GetAsyncKeyState('E')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(0.0f, -0.01f, 0.0f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+
+			if (GetAsyncKeyState(VK_SHIFT)) {
+				if (p->y < posY) {
+					posY = p->y;
+					tempWorld *= XMMatrixRotationX(-0.005);
+					copyWorld = worldMatrix;
+					copyWorld = copyWorld * tempWorld;
+				}
+
+				if (p->y > posY) {
+					posY = p->y;
+					tempWorld *= XMMatrixRotationX(0.005);
+					copyWorld = worldMatrix;
+					copyWorld = copyWorld * tempWorld;
+				}
+
+				if (p->x < posX) {
+					posX = p->x;
+					tempWorld *= XMMatrixRotationY(-0.005);
+					copyWorld = worldMatrix;
+					copyWorld = copyWorld * tempWorld;
+				}
+
+				if (p->x > posX) {
+					posX = p->x;
+					tempWorld *= XMMatrixRotationY(0.005);
+					copyWorld = worldMatrix;
+					copyWorld = copyWorld * tempWorld;
+				}
+			}
+
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(copyWorld) * skyMatrix;
 			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
