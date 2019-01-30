@@ -28,7 +28,15 @@ class LetsDrawSomeStuff
 	
 	//Matricies
 
+	ID3D11RasterizerState* mySkyboxRasterizerState = nullptr;
+	ID3D11RasterizerState* mySunRasterizerState = nullptr;
+	ID3D11RasterizerState* myEarthRasterizerState = nullptr;
+	ID3D11RasterizerState* myMoonRasterizerState = nullptr;
+	ID3D11RasterizerState* myMarsRasterizerState = nullptr;
+	ID3D11RasterizerState* myShipRasterizerState = nullptr;
+
 	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
+	ID3D11ShaderResourceView* earthbumpShaderResource = nullptr;
 	ID3D11ShaderResourceView* earthShaderResource = nullptr;
 	ID3D11ShaderResourceView* sunShaderResource = nullptr;
 	ID3D11ShaderResourceView* moonShaderResource = nullptr;
@@ -419,6 +427,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// TODO: Create new DirectX stuff here! (Buffers, Shaders, Layouts, Views, Textures, etc...)
 
+			
+
 			//Create Vertex Shader
 			myDevice->CreateVertexShader(VertexShader_PPIV, sizeof(VertexShader_PPIV), nullptr, &myVertexShader);
 			myDevice->CreateVertexShader(LightVertexShader_PPIV, sizeof(LightVertexShader_PPIV), nullptr, &myVertexLightShader);
@@ -426,6 +436,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Create Pixel Shader
 			myDevice->CreatePixelShader(PixelShader_PPIV, sizeof(PixelShader_PPIV), nullptr, &myPixelShader);
 			myDevice->CreatePixelShader(LightPixelShader_PPIV, sizeof(LightPixelShader_PPIV), nullptr, &myLightPixelShader);
+
 
 
 			//Load in Planet model
@@ -506,9 +517,38 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			D3D11_BUFFER_DESC bDesc;
 			D3D11_SUBRESOURCE_DATA subData;
+			D3D11_RASTERIZER_DESC rDesc;
 
 			ZeroMemory(&bDesc, sizeof(bDesc));
 			ZeroMemory(&subData, sizeof(subData));
+			ZeroMemory(&rDesc, sizeof(rDesc));
+
+			rDesc.FillMode = D3D11_FILL_SOLID;
+			rDesc.CullMode = D3D11_CULL_FRONT;
+			rDesc.DepthBias = 0;
+			rDesc.SlopeScaledDepthBias = 0.0f;
+			rDesc.DepthBiasClamp = 0.0f;
+			rDesc.DepthClipEnable = TRUE;
+			rDesc.ScissorEnable = FALSE;
+			rDesc.MultisampleEnable = FALSE;
+			rDesc.AntialiasedLineEnable = FALSE;
+			hr = myDevice->CreateRasterizerState(&rDesc, &mySkyboxRasterizerState);
+
+			rDesc.FillMode = D3D11_FILL_SOLID;
+			rDesc.CullMode = D3D11_CULL_BACK;
+			rDesc.DepthBias = 0;
+			rDesc.SlopeScaledDepthBias = 0.0f;
+			rDesc.DepthBiasClamp = 0.0f;
+			rDesc.DepthClipEnable = TRUE;
+			rDesc.ScissorEnable = FALSE;
+			rDesc.MultisampleEnable = FALSE;
+			rDesc.AntialiasedLineEnable = FALSE;
+			hr = myDevice->CreateRasterizerState(&rDesc, &mySunRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myEarthRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myMoonRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myMarsRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myShipRasterizerState);
+
 
 			//Vertex Planet Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -553,11 +593,13 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			bDesc.CPUAccessFlags = 0;
 			hr = myDevice->CreateBuffer(&bDesc, nullptr, &myConstantBuffer);
 
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthbumpShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthbumpTexture.dds", nullptr, &earthShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/sunTexture.dds", nullptr, &sunShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonTexture.dds", nullptr, &moonShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsTexture.dds", nullptr, &marsShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/spaceShipTexture.dds", nullptr, &shipShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/starSkyBox.dds", nullptr, &skyboxShaderResource);
 
 			// Create the sample state
 			D3D11_SAMPLER_DESC sampDesc = {};
@@ -572,6 +614,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			//World Matrix
 			worldMatrix = XMMatrixIdentity();
+			copyWorld = XMMatrixIdentity();
+			tempWorld = XMMatrixIdentity();
 
 			//View Matrices
 			viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
@@ -580,6 +624,10 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Projection Matrix
 			projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), ratio, 0.1f, 100.0f);
 
+
+			skyMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&SkyPos));
+			XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
+			skyMatrix *= skyScale;
 
 		}
 	}
@@ -600,12 +648,19 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myVertexBuffer->Release();
 	myIndexBuffer->Release();
 	myConstantBuffer->Release();
+	earthbumpShaderResource->Release();
 	earthShaderResource->Release();
 	sunShaderResource->Release();
 	moonShaderResource->Release();
 	marsShaderResource->Release();
 	shipShaderResource->Release();
+	skyboxShaderResource->Release();
 	mySampler->Release();
+	mySunRasterizerState->Release();
+	myEarthRasterizerState->Release();
+	myMoonRasterizerState->Release();
+	myMarsRasterizerState->Release();
+	myShipRasterizerState->Release();
 
 	// TODO: "Release()" more stuff here!
 	//delete &WorldMatrix;
@@ -646,9 +701,11 @@ void LetsDrawSomeStuff::Render()
 
 			ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-			//Clear Screen to Black
+
+			//Clear Screen to Black			
 			const float black[] = { 0.2f, 0.2f, 0.2f, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
+			
 			
 			if (myDriverType == D3D_DRIVER_TYPE_REFERENCE)
 			{
@@ -662,6 +719,7 @@ void LetsDrawSomeStuff::Render()
 					timeStart = timeCur;
 				curDeg = (timeCur - timeStart) / 1000.0f;
 			}
+
 
 
 			//////////////////////////////////////////////
@@ -683,7 +741,7 @@ void LetsDrawSomeStuff::Render()
 			//Moon Position
 			XMFLOAT4 MoonPos = { 7.0f, 0.0f, 0.0f, 1.0f };
 			//Moon Color
-			XMFLOAT4 MoonColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			XMFLOAT4 MoonColor = { 1.0f, 0.5f, 0.5f, 0.5f };
 
 			//Mars Position
 			XMFLOAT4 MarsPos = { 25.0f, 0.0f, 0.0f, 1.0f };
@@ -691,10 +749,10 @@ void LetsDrawSomeStuff::Render()
 			XMFLOAT4 MarsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 			//Ship Position
-			XMFLOAT4 ShipPos = { 23.0f, 0.0f, 0.0f, 1.0f };
+			XMFLOAT4 ShipPos = { 27.0f, 0.0f, 0.0f, 1.0f };
 			//Ship Color
 			XMFLOAT4 ShipColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
+			
 			//Tilt the Earth
 
 			//Rotate the Earth around the Axis
@@ -704,6 +762,7 @@ void LetsDrawSomeStuff::Render()
 			XMFLOAT4X4 viewfloat;
 			XMStoreFloat4x4(&viewfloat, viewMatrix);
 			viewMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
+			
 
 			//Enter Key: Reset Camera
 			if (GetAsyncKeyState(VK_RETURN)) {
@@ -747,7 +806,61 @@ void LetsDrawSomeStuff::Render()
 			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 
+		//TODO: Render SkyBox
+			myContext->RSSetState(mySkyboxRasterizerState);
+
+			//Move SkyBox
+
+
+			if (GetAsyncKeyState('W')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(0.0f, 0.0f, 0.01f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+
+			if (GetAsyncKeyState('A')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(-0.01f, 0.0f, 0.0f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+
+			if (GetAsyncKeyState('S')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+
+			if (GetAsyncKeyState('D')) {
+				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				tempWorld *= XMMatrixTranslation(0.01f, 0.0f, 0.0f);
+				copyWorld = worldMatrix;
+				copyWorld = copyWorld * tempWorld;
+			}
+			//Change Constant Buffer
+			constBuff.cWorld = XMMatrixTranspose(copyWorld) * skyMatrix;
+			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+			//Update Constant Buffer
+			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+			//Set Vertex Shader and Vertex Constant Buffer
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+			myContext->PSSetShaderResources(0, 1, &skyboxShaderResource);
+			myContext->PSSetSamplers(0, 1, &mySampler);
+
+			//Draw Sun
+			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+
 		//TODO: Render Sun
+			myContext->RSSetState(mySunRasterizerState);
 						
 			//Positioning and Scaling
 			sunMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&SunPos));
@@ -775,6 +888,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render Earth
+			myContext->RSSetState(myEarthRasterizerState);
 			
 			//Orbiting
 			XMMATRIX earthOrbit = XMMatrixRotationY(-0.027f * curDeg);
@@ -791,6 +905,7 @@ void LetsDrawSomeStuff::Render()
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
+			myContext->VSSetShaderResources(0, 1, &earthbumpShaderResource);
 
 			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
@@ -805,6 +920,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render the Moon
+			myContext->RSSetState(myMoonRasterizerState);
 
 			//Orbiting
 			XMVECTOR MoonVec = XMLoadFloat4(&MoonPos);
@@ -841,6 +957,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render Mars
+			myContext->RSSetState(myMarsRasterizerState);
 
 			//Orbiting
 			XMVECTOR marsOrbitVec = XMLoadFloat4(&MarsPos);
@@ -873,6 +990,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render the Ship
+			myContext->RSSetState(myShipRasterizerState);
 
 			UINT shipStrides[] = { sizeof(Vertex) };
 			UINT shipOffsets[] = { 0 };
@@ -887,7 +1005,7 @@ void LetsDrawSomeStuff::Render()
 			//Orbiting
 			XMVECTOR ShipVec = XMLoadFloat4(&ShipPos);
 			XMVECTOR oldFaceVec = ShipVec;
-			XMMATRIX RotateShip = XMMatrixRotationY(2.0f * curDeg);
+			XMMATRIX RotateShip = XMMatrixRotationY(0.75f * curDeg);
 			ShipVec = XMVector3Transform(ShipVec, RotateShip);
 			XMVECTOR vecOfDiff = XMVector3AngleBetweenVectors(ShipVec, oldFaceVec);
 			XMFLOAT4 floatOfDiff;
@@ -897,6 +1015,7 @@ void LetsDrawSomeStuff::Render()
 
 
 			//Positioning and Scaling
+			//shipMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
 			shipMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 			if (ShipPos.z >= 0) {
 				shipMatrix *= XMMatrixRotationY(-floatOfDiff.y);
@@ -904,10 +1023,9 @@ void LetsDrawSomeStuff::Render()
 			if (ShipPos.z < 0) {
 				shipMatrix *= XMMatrixRotationY(floatOfDiff.y);
 			}
-			shipMatrix *= XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
 			XMMATRIX shipScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
-			shipMatrix *= shipScale;
-			shipMatrix *= XMMatrixTranslation(MarsPos.x, MarsPos.y, MarsPos.z);
+			shipMatrix = shipMatrix * XMMatrixTranslationFromVector(1.8f * XMLoadFloat4(&ShipPos)) * shipScale;
+			shipMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
 			//Rotate Around Axis
 
 			//Change Constant Buffer

@@ -32,6 +32,7 @@ struct OutputVertex {
 
 OutputVertex main(InputVertex input) {
 	OutputVertex output = (OutputVertex)0;
+
 	output.pos = mul(input.pos, vsWorld);
 	output.pos = mul(output.pos, vsView);
 	output.pos = mul(output.pos, vsProjection);

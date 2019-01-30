@@ -53,13 +53,18 @@ XMMATRIX viewMatrix;
 XMMATRIX projectionMatrix;
 XMMATRIX ReturnViewMatrix;
 XMMATRIX shipMatrix;
+XMMATRIX flipMatrix;
 XMMATRIX earthMatrix;
 XMMATRIX moonMatrix;
 XMMATRIX marsMatrix;
+XMMATRIX skyMatrix;
 XMMATRIX sunMatrix;
 XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
+
+XMMATRIX copyWorld;
+XMMATRIX tempWorld;
 
 XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -15.0f, 0.0f);
 XMVECTOR Focus = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -75,3 +80,10 @@ LPPOINT p = { &point }, q = { &point };
 
 
 float timeSpent = 0, curDeg = 0, posX = 0, posY = 0;
+
+
+
+
+//SkyBox Position
+XMFLOAT4 SkyPos = { 0,0,0,1 };
+XMFLOAT4 DynSkyPos = { 1,0,0,1 };

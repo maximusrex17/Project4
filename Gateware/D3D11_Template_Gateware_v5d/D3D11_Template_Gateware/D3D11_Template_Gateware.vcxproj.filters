@@ -65,7 +65,7 @@
     <FxCompile Include="LightPixelShader_PPIV.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\test.FBX" />
     <None Include="Assets\planet.fbx" />
+    <None Include="skybox.FBX" />
   </ItemGroup>
 </Project>
