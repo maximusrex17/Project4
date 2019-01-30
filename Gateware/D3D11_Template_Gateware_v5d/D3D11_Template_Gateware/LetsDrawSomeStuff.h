@@ -36,7 +36,6 @@ class LetsDrawSomeStuff
 	ID3D11RasterizerState* myShipRasterizerState = nullptr;
 
 	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
-	ID3D11ShaderResourceView* earthbumpShaderResource = nullptr;
 	ID3D11ShaderResourceView* earthShaderResource = nullptr;
 	ID3D11ShaderResourceView* sunShaderResource = nullptr;
 	ID3D11ShaderResourceView* moonShaderResource = nullptr;
@@ -593,8 +592,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			bDesc.CPUAccessFlags = 0;
 			hr = myDevice->CreateBuffer(&bDesc, nullptr, &myConstantBuffer);
 
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthbumpShaderResource);
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthbumpTexture.dds", nullptr, &earthShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/sunTexture.dds", nullptr, &sunShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonTexture.dds", nullptr, &moonShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsTexture.dds", nullptr, &marsShaderResource);
@@ -648,7 +646,6 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myVertexBuffer->Release();
 	myIndexBuffer->Release();
 	myConstantBuffer->Release();
-	earthbumpShaderResource->Release();
 	earthShaderResource->Release();
 	sunShaderResource->Release();
 	moonShaderResource->Release();
@@ -729,7 +726,7 @@ void LetsDrawSomeStuff::Render()
 			//Sun Position
 			XMFLOAT4 SunPos = { 0.0f, 0.0f, 0.0f, 1.0f };
 			//Sun Direction (Directional Light)
-			XMFLOAT4 SunDir = { 0.0f, 0.0f, 1.0f, 1.0f };
+			XMFLOAT4 SunDir = { 5.0f, 0.0f, 1.0f, 1.0f };
 			//Sun Color
 			XMFLOAT4 SunColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -751,8 +748,15 @@ void LetsDrawSomeStuff::Render()
 			//Ship Position
 			XMFLOAT4 ShipPos = { 27.0f, 0.0f, 0.0f, 1.0f };
 			//Ship Color
-			XMFLOAT4 ShipColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-			
+			XMFLOAT4 ShipColor = { 0.0f, 1.0f, 1.0f, 1.0f };
+
+			//Spot Position
+			XMFLOAT4 SpotPos = { 15.0f, 0.0f, 1.0f, 1.0f };
+			//Spot Color
+			XMFLOAT4 SpotColor = { 1.0f, 0.0f, 1.0f, 0.5f };
+			//Sun Direction (Directional Light)
+			XMFLOAT4 SpotDir = { 5.0f, 0.0f, 1.0f, 1.0f };
+
 			//Tilt the Earth
 
 			//Rotate the Earth around the Axis
@@ -770,9 +774,9 @@ void LetsDrawSomeStuff::Render()
 			}
 
 			XMMATRIX RotateLight = XMMatrixRotationY(-curDeg);
-			XMVECTOR LightVec = XMLoadFloat4(&SunDir);
+			XMVECTOR LightVec = XMLoadFloat4(&SpotDir);
 			LightVec = XMVector3Transform(LightVec, RotateLight);
-			XMStoreFloat4(&SunDir, LightVec);
+			XMStoreFloat4(&SpotDir, LightVec);
 
 
 			
@@ -801,8 +805,11 @@ void LetsDrawSomeStuff::Render()
 			constBuff.cProjection = XMMatrixTranspose(projectionMatrix);
 			constBuff.cRotateY = XMMatrixRotationY(0.0f);
 			constBuff.cLightPos = SunPos;
+			constBuff.cLightPos1 = SpotPos;
 			constBuff.cLightDir = SunDir;
+			constBuff.cLightDir1 = SpotDir;
 			constBuff.cLightColor = SunColor;
+			constBuff.cLightColor1 = SpotColor;
 			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 
@@ -887,7 +894,72 @@ void LetsDrawSomeStuff::Render()
 			//Draw Sun
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
+		//TODO: Render the Ship
+			myContext->RSSetState(myShipRasterizerState);
+
+			UINT shipStrides[] = { sizeof(Vertex) };
+			UINT shipOffsets[] = { 0 };
+			ID3D11Buffer *shipTempVB[] = { myShipVertexBuffer };
+
+			//Set Vertex Buffer
+			myContext->IASetVertexBuffers(0, 1, shipTempVB, shipStrides, shipOffsets);
+
+			//Set Index Buffer
+			myContext->IASetIndexBuffer(myShipIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			//Orbiting
+			XMVECTOR ShipVec = XMLoadFloat4(&ShipPos);
+			XMVECTOR oldFaceVec = ShipVec;
+			XMMATRIX RotateShip = XMMatrixRotationY(0.75f * curDeg);
+			ShipVec = XMVector3Transform(ShipVec, RotateShip);
+			XMVECTOR vecOfDiff = XMVector3AngleBetweenVectors(ShipVec, oldFaceVec);
+			XMFLOAT4 floatOfDiff;
+			XMStoreFloat4(&floatOfDiff, vecOfDiff);
+			XMStoreFloat4(&ShipPos, ShipVec);
+			printf("Current z position of ship: %f\n", ShipPos.z);
+
+
+			//Positioning and Scaling
+			//shipMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
+			shipMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+			if (ShipPos.z >= 0) {
+				shipMatrix *= XMMatrixRotationY(-floatOfDiff.y);
+			}
+			if (ShipPos.z < 0) {
+				shipMatrix *= XMMatrixRotationY(floatOfDiff.y);
+			}
+			XMMATRIX shipScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
+			shipMatrix = shipMatrix * XMMatrixTranslationFromVector(1.8f * XMLoadFloat4(&ShipPos)) * shipScale;
+			shipMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
+			//Rotate Around Axis
+
+			//Change Constant Buffer
+			constBuff.cWorld = XMMatrixTranspose(shipMatrix);
+
+			//Set Vertex Shader and Vertex Constant Buffer
+			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+			//Update Constant Buffer
+			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
+			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->PSSetShader(myPixelShader, nullptr, 0);
+			myContext->PSSetShaderResources(0, 1, &shipShaderResource);
+			myContext->PSSetSamplers(0, 1, &mySampler);
+
+			//Draw Ship
+			myContext->DrawIndexed(shipIndicies.size(), 0, 0);
+
 		//TODO: Render Earth
+
+			//Set Vertex Buffer
+			myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
+
+			//Set Index Buffer
+			myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
 			myContext->RSSetState(myEarthRasterizerState);
 			
 			//Orbiting
@@ -905,7 +977,6 @@ void LetsDrawSomeStuff::Render()
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
-			myContext->VSSetShaderResources(0, 1, &earthbumpShaderResource);
 
 			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
@@ -972,6 +1043,8 @@ void LetsDrawSomeStuff::Render()
 
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(marsMatrix) * XMMatrixRotationY(1.026f * curDeg);
+			constBuff.cLightPos = ShipPos;
+			constBuff.cLightColor = ShipColor;
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
@@ -988,64 +1061,6 @@ void LetsDrawSomeStuff::Render()
 
 			//Draw Mars
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
-
-		//TODO: Render the Ship
-			myContext->RSSetState(myShipRasterizerState);
-
-			UINT shipStrides[] = { sizeof(Vertex) };
-			UINT shipOffsets[] = { 0 };
-			ID3D11Buffer *shipTempVB[] = { myShipVertexBuffer };
-
-			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, shipTempVB, shipStrides, shipOffsets);
-
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(myShipIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-			//Orbiting
-			XMVECTOR ShipVec = XMLoadFloat4(&ShipPos);
-			XMVECTOR oldFaceVec = ShipVec;
-			XMMATRIX RotateShip = XMMatrixRotationY(0.75f * curDeg);
-			ShipVec = XMVector3Transform(ShipVec, RotateShip);
-			XMVECTOR vecOfDiff = XMVector3AngleBetweenVectors(ShipVec, oldFaceVec);
-			XMFLOAT4 floatOfDiff;
-			XMStoreFloat4(&floatOfDiff, vecOfDiff);
-			XMStoreFloat4(&ShipPos, ShipVec);
-			printf("Current z position of ship: %f\n", ShipPos.z);
-
-
-			//Positioning and Scaling
-			//shipMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
-			shipMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-			if (ShipPos.z >= 0) {
-				shipMatrix *= XMMatrixRotationY(-floatOfDiff.y);
-			}
-			if (ShipPos.z < 0) {
-				shipMatrix *= XMMatrixRotationY(floatOfDiff.y);
-			}
-			XMMATRIX shipScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
-			shipMatrix = shipMatrix * XMMatrixTranslationFromVector(1.8f * XMLoadFloat4(&ShipPos)) * shipScale;
-			shipMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
-			//Rotate Around Axis
-
-			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(shipMatrix);
-
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-
-			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
-			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &shipShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
-
-			//Draw Ship
-			myContext->DrawIndexed(shipIndicies.size(), 0, 0);
 
 			mySwapChain->Present(0, 0); // set first argument to 1 to enable vertical refresh sync with display
 

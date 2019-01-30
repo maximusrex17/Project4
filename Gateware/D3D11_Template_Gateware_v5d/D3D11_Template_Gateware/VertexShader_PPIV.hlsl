@@ -12,8 +12,11 @@ cbuffer ConstantBuffer : register(b0) {
 	matrix vsProjection;
 	matrix vsRotateY;
 	float4 vsLightPos;
+	float4 vsLightPos1;
 	float4 vsLightDir;
+	float4 vsLightDir1;
 	float4 vsLightColor;
+	float4 vsLightColor1;
 	float4 vsOutputColor;
 }
 

@@ -35,8 +35,11 @@ struct ConstantBuffer
 	XMMATRIX cProjection;
 	XMMATRIX cRotateY;
 	XMFLOAT4 cLightPos;
+	XMFLOAT4 cLightPos1;
 	XMFLOAT4 cLightDir;
+	XMFLOAT4 cLightDir1;
 	XMFLOAT4 cLightColor;
+	XMFLOAT4 cLightColor1;
 	XMFLOAT4 cOutputColor;
 };
 

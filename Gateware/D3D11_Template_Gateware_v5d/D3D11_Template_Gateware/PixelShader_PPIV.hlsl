@@ -7,8 +7,11 @@ cbuffer ConstantBuffer : register(b0) {
 	matrix vsProjection;
 	matrix vsRotateY;
 	float4 vsLightPos;
+	float4 vsLightPos1;
 	float4 vsLightDir;
+	float4 vsLightDir1;
 	float4 vsLightColor;
+	float4 vsLightColor1;
 	float4 vsOutputColor;
 }
 
@@ -22,15 +25,30 @@ struct OutputVertex {
 float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 {
 	float4 finalColor = 0;
+	float4 pointFinalColor = 0;
+	float4 spotFinalColor = 0;
 
-	float4 lightDir = 0;
+	float4 pointLightDir = 0;
+	float4 spotLightDir = 0;
 	float4 lightRatio = 0;
 	float4 surfaceColor = 0;
+	float4 spotFactor = 0;
+	float4 surfaceRatio = 0;
+	float4 coneRatio = 0;
+	coneRatio = 0.15f;
 
+	//Point Light
 	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
-	lightDir = normalize(vsLightPos - InputPixel.wPos);
-	lightRatio = saturate(dot(lightDir.xyz, InputPixel.norm));
-	finalColor = (lightRatio * vsLightColor * surfaceColor);
+	pointLightDir = normalize(vsLightPos - InputPixel.wPos);
+	lightRatio = saturate(dot(pointLightDir.xyz, InputPixel.norm));	
+	pointFinalColor = (lightRatio * vsLightColor * surfaceColor);
+
+	//SpotLight
+	spotLightDir = normalize(vsLightPos1 - InputPixel.wPos);
+	surfaceRatio = saturate(dot(-spotLightDir.xyz, vsLightDir1));
+	spotFactor = (surfaceRatio > coneRatio) ? 1 : 0;
+	spotFinalColor = (spotFactor * lightRatio * vsLightColor1 * surfaceColor);
+	finalColor = pointFinalColor + spotFinalColor;
 
 	return finalColor;
 }
