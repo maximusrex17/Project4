@@ -1,5 +1,5 @@
 Texture2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+SamplerState samLinear : register(s1);
 
 cbuffer ConstantBuffer : register(b0) {
 	matrix vsWorld;
@@ -44,13 +44,13 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 	pointLightRatio = saturate(dot(pointLightDir.xyz, InputPixel.norm));	
 	pointFinalColor = (pointLightRatio * vsLightColor * surfaceColor);
 
-	//SpotLight
-	spotLightDir = normalize(vsLightPos1 - InputPixel.wPos);
-	surfaceRatio = saturate(dot(-spotLightDir.xyz, vsLightDir1));
-	spotLightRatio = normalize(vsLightPos1 - InputPixel.wPos);
-	spotFactor = (surfaceRatio > coneRatio) ? 1 : 0;
-	spotFinalColor = (spotFactor * spotLightRatio * vsLightColor1 * surfaceColor);
-	finalColor = pointFinalColor + spotFinalColor;
+	////SpotLight
+	//spotLightDir = normalize(vsLightPos1 - InputPixel.wPos);
+	//surfaceRatio = saturate(dot(-spotLightDir.xyz, vsLightDir1));
+	//spotLightRatio = normalize(vsLightPos1 - InputPixel.wPos);
+	//spotFactor = (surfaceRatio > coneRatio) ? 1 : 0;
+	//spotFinalColor = (spotFactor * spotLightRatio * vsLightColor1 * surfaceColor);
+	finalColor = pointFinalColor;// +spotFinalColor;
 
 	return finalColor;
 }

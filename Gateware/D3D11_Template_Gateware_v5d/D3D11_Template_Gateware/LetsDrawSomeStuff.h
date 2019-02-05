@@ -34,12 +34,16 @@ class LetsDrawSomeStuff
 	ID3D11RasterizerState* myMoonRasterizerState = nullptr;
 	ID3D11RasterizerState* myMarsRasterizerState = nullptr;
 	ID3D11RasterizerState* myShipRasterizerState = nullptr;
-
+	
+	ID3D11ShaderResourceView* noHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
 	ID3D11ShaderResourceView* earthShaderResource = nullptr;
+	ID3D11ShaderResourceView* earthHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* sunShaderResource = nullptr;
 	ID3D11ShaderResourceView* moonShaderResource = nullptr;
+	ID3D11ShaderResourceView* moonHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* marsShaderResource = nullptr;
+	ID3D11ShaderResourceView* marsHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* shipShaderResource = nullptr;
 	ID3D11SamplerState* mySampler = nullptr;
 	
@@ -510,6 +514,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "HEIGHT", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			};
 
 			hr = myDevice->CreateInputLayout(ieDesc, ARRAYSIZE(ieDesc), VertexShader_PPIV, sizeof(VertexShader_PPIV), &myInputLayout);
@@ -592,12 +597,29 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			bDesc.CPUAccessFlags = 0;
 			hr = myDevice->CreateBuffer(&bDesc, nullptr, &myConstantBuffer);
 
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthShaderResource);
+			//No Height
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/noHeightTexture.dds", nullptr, &noHeightShaderResource);
+
+			//Sun
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/sunTexture.dds", nullptr, &sunShaderResource);
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonTexture.dds", nullptr, &moonShaderResource);
-			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsTexture.dds", nullptr, &marsShaderResource);
+
+			//Ship
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/spaceShipTexture.dds", nullptr, &shipShaderResource);
+
+			//SkyBox
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/starSkyBox.dds", nullptr, &skyboxShaderResource);
+
+			//Earth
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthTexture.dds", nullptr, &earthShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/earthbumTexture.dds", nullptr, &earthHeightShaderResource);
+
+			//Moon
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonTexture.dds", nullptr, &moonShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/moonHeightTexture.dds", nullptr, &moonHeightShaderResource);
+
+			//Mars
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsTexture.dds", nullptr, &marsShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsHeightTexture.dds", nullptr, &marsHeightShaderResource);
 
 			// Create the sample state
 			D3D11_SAMPLER_DESC sampDesc = {};
@@ -635,29 +657,51 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 LetsDrawSomeStuff::~LetsDrawSomeStuff()
 {
 	// Release DX Objects aquired from the surface
+	//Base Releases
 	myDevice->Release();
 	mySwapChain->Release();
 	myContext->Release();
 	myInputLayout->Release();
-	myVertexShader->Release();
-	myVertexLightShader->Release();
-	myPixelShader->Release();
-	myLightPixelShader->Release();
-	myVertexBuffer->Release();
 	myIndexBuffer->Release();
 	myConstantBuffer->Release();
-	earthShaderResource->Release();
-	sunShaderResource->Release();
-	moonShaderResource->Release();
-	marsShaderResource->Release();
-	shipShaderResource->Release();
-	skyboxShaderResource->Release();
 	mySampler->Release();
-	mySunRasterizerState->Release();
+	myVertexBuffer->Release();
+	noHeightShaderResource->Release();
+
+	//Vertex Releases
+	myVertexShader->Release();
+	myVertexLightShader->Release();
+
+	//Pixel Releases
+	myPixelShader->Release();
+	myLightPixelShader->Release();
+
+	//Earth Releases
+	earthShaderResource->Release();
+	earthHeightShaderResource->Release();
 	myEarthRasterizerState->Release();
+
+	//Sun Releases
+	sunShaderResource->Release();
+	mySunRasterizerState->Release();
+
+	//Moon Releases
+	moonShaderResource->Release();
+	moonHeightShaderResource->Release();
 	myMoonRasterizerState->Release();
+
+	//Mars Releases
+	marsShaderResource->Release();
+	marsHeightShaderResource->Release();
 	myMarsRasterizerState->Release();
+
+	//Ship Releases
+	shipShaderResource->Release();
 	myShipRasterizerState->Release();
+
+	//Skybox Releases
+	skyboxShaderResource->Release();
+	mySkyboxRasterizerState->Release();
 
 	// TODO: "Release()" more stuff here!
 	//delete &WorldMatrix;
@@ -901,14 +945,16 @@ void LetsDrawSomeStuff::Render()
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
+			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+			myContext->VSSetSamplers(0, 1, &mySampler);
 
 			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 			myContext->PSSetShaderResources(0, 1, &skyboxShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
+			myContext->PSSetSamplers(1, 1, &mySampler);
 
-			//Draw Sun
+			//Draw SkyBox
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
 
 		//TODO: Render Sun
@@ -928,13 +974,14 @@ void LetsDrawSomeStuff::Render()
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
 
 			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 			myContext->PSSetShaderResources(0, 1, &sunShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
+			myContext->PSSetSamplers(1, 1, &mySampler);
 
 			//Draw Sun
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
@@ -983,6 +1030,7 @@ void LetsDrawSomeStuff::Render()
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
 
 			//Update Constant Buffer
@@ -1022,6 +1070,8 @@ void LetsDrawSomeStuff::Render()
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
+			myContext->VSSetShaderResources(0, 1, &earthHeightShaderResource);
+			myContext->VSSetSamplers(0, 1, &mySampler);
 
 			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
@@ -1058,6 +1108,7 @@ void LetsDrawSomeStuff::Render()
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShaderResources(0, 1, &moonHeightShaderResource);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
 
 			//Update Constant Buffer
@@ -1088,11 +1139,12 @@ void LetsDrawSomeStuff::Render()
 
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(marsMatrix) * XMMatrixRotationY(1.026f * curDeg);
-			constBuff.cLightPos = ShipPos;
-			constBuff.cLightColor = ShipColor;
+			//constBuff.cLightPos = ShipPos;
+			//constBuff.cLightColor = ShipColor;
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+			myContext->VSSetShaderResources(0, 1, &marsHeightShaderResource);
 			myContext->VSSetShader(myVertexShader, nullptr, 0);
 
 			//Update Constant Buffer

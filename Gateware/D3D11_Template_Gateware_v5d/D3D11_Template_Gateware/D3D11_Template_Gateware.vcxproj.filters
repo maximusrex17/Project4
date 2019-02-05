@@ -68,4 +68,7 @@
     <None Include="Assets\planet.fbx" />
     <None Include="skybox.FBX" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="noHeightTexture.DDS" />
+  </ItemGroup>
 </Project>
