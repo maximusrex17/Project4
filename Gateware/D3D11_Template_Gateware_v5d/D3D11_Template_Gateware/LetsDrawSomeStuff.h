@@ -20,8 +20,10 @@ class LetsDrawSomeStuff
 	ID3D11PixelShader *myLightPixelShader = nullptr;
 	ID3D11Buffer *myVertexBuffer = nullptr;
 	ID3D11Buffer *myShipVertexBuffer = nullptr;
+	ID3D11Buffer *mySkyVertexBuffer = nullptr;
 	ID3D11Buffer *myIndexBuffer = nullptr;
 	ID3D11Buffer *myShipIndexBuffer = nullptr;
+	ID3D11Buffer *mySkyIndexBuffer = nullptr;
 	ID3D11Buffer *myConstantBuffer = nullptr;
 	D3D11_VIEWPORT myPort;
 	D3D_DRIVER_TYPE myDriverType = D3D_DRIVER_TYPE_NULL;
@@ -507,6 +509,39 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Process the scene and build DirectX Arrays
 			ProcessFbxMesh(lScene->GetRootNode(), Ship, shipIndicies);
+
+			//Load in Planet model
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "skybox.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), SkyBox, skyBoxIndicies);
 			
 
 			//Create Input Layout
@@ -590,6 +625,24 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			subData.pSysMem = shipIndicies.data();
 			myDevice->CreateBuffer(&bDesc, &subData, &myShipIndexBuffer);
 
+			//Vertex Sky Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * SkyBox.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = SkyBox.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &mySkyVertexBuffer);
+
+			//Index Sky Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * skyBoxIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = skyBoxIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &mySkyIndexBuffer);
+
 			//Constant Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
 			bDesc.ByteWidth = sizeof(ConstantBuffer);
@@ -647,7 +700,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			skyMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&SkyPos));
 			XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
-			skyMatrix *= skyScale;
+			skyMatrix = XMMatrixMultiply(skyMatrix,skyScale);
 
 		}
 	}
@@ -700,6 +753,8 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myShipRasterizerState->Release();
 
 	//Skybox Releases
+	mySkyVertexBuffer->Release();
+	mySkyIndexBuffer->Release();
 	skyboxShaderResource->Release();
 	mySkyboxRasterizerState->Release();
 
@@ -810,6 +865,10 @@ void LetsDrawSomeStuff::Render()
 			XMFLOAT4X4 viewfloat;
 			XMStoreFloat4x4(&viewfloat, viewMatrix);
 			viewMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
+
+			XMFLOAT4X4 skyfloat;
+			XMStoreFloat4x4(&skyfloat, skyMatrix);
+			skyMatrix = XMLoadFloat4x4(&MoveSky(skyfloat));
 			
 
 			//Enter Key: Reset Camera
@@ -831,17 +890,7 @@ void LetsDrawSomeStuff::Render()
 
 			//Set Primitive Topology
 			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			
-			UINT strides[] = { sizeof(Vertex) };
-			UINT offsets[] = { 0 };
-			ID3D11Buffer *tempVB[] = { myVertexBuffer };
 
-			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
-
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-			
 			//Set Constant Buffer
 			ConstantBuffer constBuff;
 			constBuff.cWorld = XMMatrixTranspose(worldMatrix);
@@ -855,9 +904,21 @@ void LetsDrawSomeStuff::Render()
 			constBuff.cLightColor = SunColor;
 			constBuff.cLightColor1 = SpotColor;
 			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+			constBuff.cFloatScale = 0.0f;
+			constBuff.cRange = 50.0f;
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 
-		//TODO: Render SkyBox
+			UINT skyStrides[] = { sizeof(Vertex) };
+			UINT skyOffsets[] = { 0 };
+			ID3D11Buffer *skyTempVB[] = { mySkyVertexBuffer };
+
+			//Set Vertex Buffer
+			myContext->IASetVertexBuffers(0, 1, skyTempVB, skyStrides, skyOffsets);
+
+			//Set Index Buffer
+			myContext->IASetIndexBuffer(mySkyIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			//TODO: Render SkyBox
 			myContext->RSSetState(mySkyboxRasterizerState);
 
 			//Move SkyBox
@@ -865,78 +926,78 @@ void LetsDrawSomeStuff::Render()
 
 			if (GetAsyncKeyState('W')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(0.0f, 0.0f, 0.01f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(0.0f, 0.0f, 0.01f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
 			if (GetAsyncKeyState('A')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(-0.01f, 0.0f, 0.0f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(-0.01f, 0.0f, 0.0f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
 			if (GetAsyncKeyState('S')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
 			if (GetAsyncKeyState('D')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(0.01f, 0.0f, 0.0f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(0.01f, 0.0f, 0.0f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
 			if (GetAsyncKeyState('Q')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(0.0f, 0.01f, 0.0f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(0.0f, 0.01f, 0.0f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
 			if (GetAsyncKeyState('E')) {
 				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				tempWorld *= XMMatrixTranslation(0.0f, -0.01f, 0.0f);
-				copyWorld = worldMatrix;
-				copyWorld = copyWorld * tempWorld;
+				skyMatrix *= XMMatrixTranslation(0.0f, -0.01f, 0.0f);
+				//copyWorld = worldMatrix;
+				//copyWorld = copyWorld * tempWorld;
 			}
 
-			if (GetAsyncKeyState(VK_SHIFT)) {
-				if (p->y < posY) {
-					posY = p->y;
-					tempWorld *= XMMatrixRotationX(-0.005);
-					copyWorld = worldMatrix;
-					copyWorld = copyWorld * tempWorld;
-				}
+			//if (GetAsyncKeyState(VK_SHIFT)) {
+			//	if (p->y < posY) {
+			//		posY = p->y;
+			//		tempWorld *= XMMatrixRotationX(-0.005);
+			//		//copyWorld = worldMatrix;
+			//		copyWorld = copyWorld * tempWorld;
+			//	}
 
-				if (p->y > posY) {
-					posY = p->y;
-					tempWorld *= XMMatrixRotationX(0.005);
-					copyWorld = worldMatrix;
-					copyWorld = copyWorld * tempWorld;
-				}
+			//	if (p->y > posY) {
+			//		posY = p->y;
+			//		tempWorld *= XMMatrixRotationX(0.005);
+			//		//copyWorld = worldMatrix;
+			//		copyWorld = copyWorld * tempWorld;
+			//	}
 
-				if (p->x < posX) {
-					posX = p->x;
-					tempWorld *= XMMatrixRotationY(-0.005);
-					copyWorld = worldMatrix;
-					copyWorld = copyWorld * tempWorld;
-				}
+			//	if (p->x < posX) {
+			//		posX = p->x;
+			//		tempWorld *= XMMatrixRotationY(-0.005);
+			//		//copyWorld = worldMatrix;
+			//		copyWorld = copyWorld * tempWorld;
+			//	}
 
-				if (p->x > posX) {
-					posX = p->x;
-					tempWorld *= XMMatrixRotationY(0.005);
-					copyWorld = worldMatrix;
-					copyWorld = copyWorld * tempWorld;
-				}
-			}
-
+			//	if (p->x > posX) {
+			//		posX = p->x;
+			//		tempWorld *= XMMatrixRotationY(0.005);
+			//		//copyWorld = worldMatrix;
+			//		copyWorld = copyWorld * tempWorld;
+			//	}
+			//}
+			//copyWorld = XMMatrixMultiply(copyWorld, tempWorld);
 			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(copyWorld) * skyMatrix;
+			constBuff.cWorld = XMMatrixTranspose(skyMatrix);// *skyMatrix;
 			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 			//Update Constant Buffer
@@ -956,6 +1017,16 @@ void LetsDrawSomeStuff::Render()
 
 			//Draw SkyBox
 			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+			
+			UINT strides[] = { sizeof(Vertex) };
+			UINT offsets[] = { 0 };
+			ID3D11Buffer *tempVB[] = { myVertexBuffer };
+
+			//Set Vertex Buffer
+			myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
+
+			//Set Index Buffer
+			myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		//TODO: Render Sun
 			myContext->RSSetState(mySunRasterizerState);
@@ -1066,6 +1137,7 @@ void LetsDrawSomeStuff::Render()
 			
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(earthMatrix) * XMMatrixRotationY(-1.0f * curDeg);
+			constBuff.cFloatScale = 0.125f;
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
@@ -1105,6 +1177,7 @@ void LetsDrawSomeStuff::Render()
 
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(moonMatrix) * XMMatrixRotationY(-0.037f * curDeg);
+			constBuff.cFloatScale = 0.02f;
 
 			//Set Vertex Shader and Vertex Constant Buffer
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
@@ -1139,6 +1212,7 @@ void LetsDrawSomeStuff::Render()
 
 			//Change Constant Buffer
 			constBuff.cWorld = XMMatrixTranspose(marsMatrix) * XMMatrixRotationY(1.026f * curDeg);
+			constBuff.cFloatScale = 0.05f;
 			//constBuff.cLightPos = ShipPos;
 			//constBuff.cLightColor = ShipColor;
 

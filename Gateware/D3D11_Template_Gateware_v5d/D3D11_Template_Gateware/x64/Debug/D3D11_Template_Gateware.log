@@ -5,34 +5,34 @@ c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_templ
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(49): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(50): warning C4305: 'argument': truncation from 'double' to 'float'
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(55): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(227): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(228): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(110): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(111): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(116): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(122): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(123): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(128): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(229): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(235): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(236): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(230): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(231): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(237): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(249): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(250): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(238): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(239): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(251): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(258): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(259): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(252): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(253): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(260): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(559): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(569): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(577): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(587): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(910): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(911): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(917): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(918): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(924): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(925): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(931): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(932): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(958): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(987): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1046): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1086): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1124): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1160): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(261): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(262): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(594): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(604): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(612): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(622): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(630): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(640): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1019): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1058): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1117): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1158): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1197): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1234): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
   D3D11_Template_Gateware.vcxproj -> C:\Users\gillj\Desktop\Project4\Gateware\D3D11_Template_Gateware_v5d\x64\Debug\D3D11_Template_Gateware.exe

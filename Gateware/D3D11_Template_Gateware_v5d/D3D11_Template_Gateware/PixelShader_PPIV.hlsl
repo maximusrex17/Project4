@@ -13,6 +13,8 @@ cbuffer ConstantBuffer : register(b0) {
 	float4 vsLightColor;
 	float4 vsLightColor1;
 	float4 vsOutputColor;
+	float vsFloatScale;
+	float vsRange;
 }
 
 struct OutputVertex {
@@ -27,6 +29,7 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 	float4 finalColor = 0;
 	float4 pointFinalColor = 0;
 	float4 spotFinalColor = 0;
+	float4 attenuation = 0;
 
 	float4 pointLightDir = 0;
 	float4 spotLightDir = 0;
@@ -40,9 +43,10 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 
 	//Point Light
 	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
+	attenuation = 1.0f - saturate(length(vsLightPos - InputPixel.wPos) / vsRange);
 	pointLightDir = normalize(vsLightPos - InputPixel.wPos);
 	pointLightRatio = saturate(dot(pointLightDir.xyz, InputPixel.norm));	
-	pointFinalColor = (pointLightRatio * vsLightColor * surfaceColor);
+	pointFinalColor = (pointLightRatio * vsLightColor * surfaceColor * attenuation);
 
 	////SpotLight
 	//spotLightDir = normalize(vsLightPos1 - InputPixel.wPos);

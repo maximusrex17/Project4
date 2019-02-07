@@ -41,11 +41,16 @@ struct ConstantBuffer
 	XMFLOAT4 cLightColor;
 	XMFLOAT4 cLightColor1;
 	XMFLOAT4 cOutputColor;
+	float cFloatScale;
+	float cRange;
 };
 
 //Vectors for Objects
 vector<Vertex> Planet;
 vector<unsigned  int> planetIndicies;
+
+vector<Vertex> SkyBox;
+vector<unsigned  int> skyBoxIndicies;
 
 vector<Vertex> Ship;
 vector<unsigned  int> shipIndicies;

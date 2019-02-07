@@ -13,6 +13,8 @@ cbuffer ConstantBuffer : register(b0) {
 	float4 vsLightColor;
 	float4 vsLightColor1;
 	float4 vsOutputColor;
+	float vsFloatScale;
+	float vsRange;
 }
 
 struct OutputVertex {

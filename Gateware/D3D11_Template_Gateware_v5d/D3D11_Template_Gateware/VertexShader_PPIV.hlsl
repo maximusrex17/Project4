@@ -18,6 +18,8 @@ cbuffer ConstantBuffer : register(b0) {
 	float4 vsLightColor;
 	float4 vsLightColor1;
 	float4 vsOutputColor;
+	float vsFloatScale;
+	float vsRange;
 }
 
 struct InputVertex {
@@ -41,7 +43,8 @@ OutputVertex main(InputVertex input)
 	OutputVertex output = (OutputVertex)0;
 	output.pos = mul(input.pos, vsWorld);
 	input.height = heightTexture.GatherRed(heightSampler, input.uv);
-	output.pos = float4(output.pos.x, output.pos.y + (input.height * 0.1f), output.pos.z, output.pos.w);
+	output.pos.xyz += (input.height*vsFloatScale);
+	//output.pos = float4(output.pos.x + (input.height * 0.05f), output.pos.y + (input.height * 0.05f), output.pos.z + (input.height * 0.05f), output.pos.w);
 	output.wPos = output.pos;
 	output.pos = mul(output.pos, vsView);
 	output.pos = mul(output.pos, vsProjection);
