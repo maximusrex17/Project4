@@ -687,7 +687,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			//World Matrix
 			worldMatrix = XMMatrixIdentity();
-			copyWorld = XMMatrixIdentity();
 			tempWorld = XMMatrixIdentity();
 
 			//View Matrices
@@ -698,9 +697,9 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), ratio, 0.1f, 100.0f);
 
 
-			skyMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&SkyPos));
-			XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
-			skyMatrix = XMMatrixMultiply(skyMatrix,skyScale);
+			skyMatrix = XMMatrixIdentity();
+			//XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
+			//skyMatrix = XMMatrixMultiply(skyMatrix,skyScale);
 
 		}
 	}
@@ -861,22 +860,120 @@ void LetsDrawSomeStuff::Render()
 			//Rotate the Earth around the Axis
 
 			//earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
+			GetCursorPos(p);
+			XMFLOAT4 eyeFloat, focusFloat;
+			XMStoreFloat4(&focusFloat, Focus);
+			XMStoreFloat4(&eyeFloat, Eye);
 
-			XMFLOAT4X4 viewfloat;
-			XMStoreFloat4x4(&viewfloat, viewMatrix);
-			viewMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
+			//W Key: Forward
+			if (GetAsyncKeyState('W')) {
+				eyeFloat.z += 0.01f;
+				focusFloat.z += 0.01f;
+			}
 
-			XMFLOAT4X4 skyfloat;
-			XMStoreFloat4x4(&skyfloat, skyMatrix);
-			skyMatrix = XMLoadFloat4x4(&MoveSky(skyfloat));
+			//A Key: Left
+			if (GetAsyncKeyState('A')) {
+				eyeFloat.x += -0.01f;
+				focusFloat.x += -0.01f;
+			}
+
+			//S Key: Backward
+			if (GetAsyncKeyState('S')) {
+				eyeFloat.z += -0.01f;
+				focusFloat.z += -0.01f;
+			}
+
+			//D Key: Right
+			if (GetAsyncKeyState('D')) {
+				eyeFloat.x += 0.01f;
+				focusFloat.x += 0.01f;
+			}
+
+			//Q Key: Rise
+			if (GetAsyncKeyState('Q')) {
+				eyeFloat.y += 0.01f;
+				focusFloat.y += 0.01f;
+			}
+
+			//E Key: Fall
+			if (GetAsyncKeyState('E')) {
+				eyeFloat.y += -0.01f;
+				focusFloat.y += -0.01f;
+			}
+			// * XMMatrixRotationX(camAngleX.x) * XMMatrixRotationY(camAngleY.y)
+
+			Eye = XMLoadFloat4(&eyeFloat);
+
+
+			////skyMatrix = camTranslate;
+			//viewMatrix = XMMatrixMultiply(viewMatrix, worldMatrix);
+			//
+			////W Key: Forward
+			//if (GetAsyncKeyState('W')) {
+			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, -0.01f), viewMatrix);
+			//}
+			//if (GetAsyncKeyState('A')) {
+			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.01f, 0.0f, 0.0f), viewMatrix);
+			//}
+			//if (GetAsyncKeyState('S')) {
+			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.01f), viewMatrix);
+			//}
+			//if (GetAsyncKeyState('D')) {
+			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(-0.01f, 0.0f, 0.0f), viewMatrix);
+			//}
+
+			if (GetAsyncKeyState(VK_SHIFT)) {
+				if (p->y < posY) {
+					posY = p->y;
+					//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(0.5f)), viewMatrix);
+					focusFloat.y += 0.1f;
+				}
+
+				if (p->y > posY) {
+					posY = p->y;
+					//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-0.5f)), viewMatrix);
+					focusFloat.y += -0.1f;
+				}
+
+				if (p->x < posX) {
+					posX = p->x;
+					//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(0.5f)));
+					focusFloat.x += -0.1f;
+				}
+
+				if (p->x > posX) {
+					posX = p->x;
+					//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(-0.5f)));
+					focusFloat.x += 0.1f;
+				}
+			}
 			
+			Focus = XMLoadFloat4(&focusFloat);
+
+			viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
+			//XMFLOAT4X4 view4x4;
+			//XMStoreFloat4x4(&view4x4, viewMatrix);
+			//
+			//viewMatrix = XMMatrixMultiply(worldMatrix, viewMatrix);
+			skyMatrix = XMMatrixTranslationFromVector(Eye);
+			//
+			//XMFLOAT4X4 viewfloat;
+			//XMStoreFloat4x4(&viewfloat, camMatrix);
+			//camMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
+
+			//XMFLOAT4X4 skyfloat;
+			//XMStoreFloat4x4(&skyfloat, camMatrix);
+			//camMatrix = XMLoadFloat4x4(&MoveSky(skyfloat));
+			//skyMatrix = XMMatrixMultiply(worldMatrix, camMatrix);
 
 			//Enter Key: Reset Camera
 			if (GetAsyncKeyState(VK_RETURN)) {
-				viewMatrix = ReturnViewMatrix;
+				Eye = eyePrime;
+				Focus = focusPrime;
+				Up = upPrime;
 			}
 
-			XMMATRIX RotateLight = XMMatrixRotationY(-curDeg);
+			XMMATRIX RotateLight = XMMatrixRotationY(-5.0*curDeg);
 			XMVECTOR LightVec = XMLoadFloat4(&SpotDir);
 			LightVec = XMVector3Transform(LightVec, RotateLight);
 			XMStoreFloat4(&SpotDir, LightVec);
@@ -899,9 +996,9 @@ void LetsDrawSomeStuff::Render()
 			constBuff.cRotateY = XMMatrixRotationY(0.0f);
 			constBuff.cLightPos = SunPos;
 			constBuff.cLightPos1 = SpotPos;
-			constBuff.cLightDir = SunDir;
+			constBuff.cLightDir = SpotDir;
 			constBuff.cLightDir1 = SpotDir;
-			constBuff.cLightColor = SunColor;
+			constBuff.cLightColor = XMFLOAT4(0,1,1,0);
 			constBuff.cLightColor1 = SpotColor;
 			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
 			constBuff.cFloatScale = 0.0f;
@@ -920,84 +1017,9 @@ void LetsDrawSomeStuff::Render()
 
 			//TODO: Render SkyBox
 			myContext->RSSetState(mySkyboxRasterizerState);
-
-			//Move SkyBox
-
-
-			if (GetAsyncKeyState('W')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(0.0f, 0.0f, 0.01f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			if (GetAsyncKeyState('A')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(-0.01f, 0.0f, 0.0f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			if (GetAsyncKeyState('S')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			if (GetAsyncKeyState('D')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(0.01f, 0.0f, 0.0f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			if (GetAsyncKeyState('Q')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(0.0f, 0.01f, 0.0f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			if (GetAsyncKeyState('E')) {
-				//viewMatrix *= XMMatrixTranslation(0.0f, 0.0f, -0.01f);
-				skyMatrix *= XMMatrixTranslation(0.0f, -0.01f, 0.0f);
-				//copyWorld = worldMatrix;
-				//copyWorld = copyWorld * tempWorld;
-			}
-
-			//if (GetAsyncKeyState(VK_SHIFT)) {
-			//	if (p->y < posY) {
-			//		posY = p->y;
-			//		tempWorld *= XMMatrixRotationX(-0.005);
-			//		//copyWorld = worldMatrix;
-			//		copyWorld = copyWorld * tempWorld;
-			//	}
-
-			//	if (p->y > posY) {
-			//		posY = p->y;
-			//		tempWorld *= XMMatrixRotationX(0.005);
-			//		//copyWorld = worldMatrix;
-			//		copyWorld = copyWorld * tempWorld;
-			//	}
-
-			//	if (p->x < posX) {
-			//		posX = p->x;
-			//		tempWorld *= XMMatrixRotationY(-0.005);
-			//		//copyWorld = worldMatrix;
-			//		copyWorld = copyWorld * tempWorld;
-			//	}
-
-			//	if (p->x > posX) {
-			//		posX = p->x;
-			//		tempWorld *= XMMatrixRotationY(0.005);
-			//		//copyWorld = worldMatrix;
-			//		copyWorld = copyWorld * tempWorld;
-			//	}
-			//}
-			//copyWorld = XMMatrixMultiply(copyWorld, tempWorld);
-			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(skyMatrix);// *skyMatrix;
+			constBuff.cWorld = XMMatrixTranspose(skyMatrix) * skyScale;
+			constBuff.cLightDir = XMFLOAT4{ 0,0,-1,0 };
+			constBuff.cLightColor = SunColor;
 			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 			//Update Constant Buffer
@@ -1011,6 +1033,9 @@ void LetsDrawSomeStuff::Render()
 
 			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
 			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+
+
 			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 			myContext->PSSetShaderResources(0, 1, &skyboxShaderResource);
 			myContext->PSSetSamplers(1, 1, &mySampler);
@@ -1037,8 +1062,9 @@ void LetsDrawSomeStuff::Render()
 			sunMatrix = sunScale * sunMatrix;
 
 			//Change Constant Buffer
+			constBuff.cLightDir = SpotDir;
+			constBuff.cLightColor = XMFLOAT4{ 0,1,1,1 };
 			constBuff.cWorld = XMMatrixTranspose(sunMatrix) * XMMatrixRotationY(0.5f * curDeg);
-			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 			//Update Constant Buffer
 			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
@@ -1097,6 +1123,8 @@ void LetsDrawSomeStuff::Render()
 			//Rotate Around Axis
 
 			//Change Constant Buffer
+			constBuff.cLightDir = SunDir;
+			constBuff.cLightColor = SunColor;
 			constBuff.cWorld = XMMatrixTranspose(shipMatrix);
 
 			//Set Vertex Shader and Vertex Constant Buffer

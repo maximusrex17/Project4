@@ -26,17 +26,25 @@ struct OutputVertex {
 
 float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 {
+	//float4 finalColor = 0;
+	//
+	//float4 lightDir = 0;
+	//float4 lightRatio = 0;
+	//float4 surfaceColor = 0;
+	//
+	//surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
+	//lightDir = normalize(vsLightPos - InputPixel.wPos);
+	//lightRatio = saturate(dot(lightDir.xyz, InputPixel.norm));
+	//lightRatio = saturate(lightRatio + 1.0f);
+	//finalColor *= txDiffuse.Sample(samLinear, InputPixel.uv);
+	//finalColor = (lightRatio * vsLightColor * surfaceColor);
+	//
+	//return finalColor;
 	float4 finalColor = 0;
+	//do NdotL lighting for 2 lights
 
-	float4 lightDir = 0;
-	float4 lightRatio = 0;
-	float4 surfaceColor = 0;
+	finalColor.rgb = saturate(dot(-vsLightDir.rgb,InputPixel.norm) * vsLightColor.rgb) * txDiffuse.Sample(samLinear, InputPixel.uv);
 
-	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
-	lightDir = normalize(vsLightPos - InputPixel.wPos);
-	lightRatio = saturate(dot(lightDir.xyz, InputPixel.norm));
-	lightRatio = saturate(lightRatio + 1.0f);
-	finalColor = (lightRatio * vsLightColor * surfaceColor);
-
+	finalColor.a = 1;
 	return finalColor;
 }

@@ -71,12 +71,19 @@ XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
 
-XMMATRIX copyWorld;
+XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
 XMMATRIX tempWorld;
 
 XMVECTOR Eye = XMVectorSet(0.0f, 4.0f, -15.0f, 0.0f);
 XMVECTOR Focus = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+XMVECTOR eyePrime = Eye;
+XMVECTOR focusPrime = Focus;
+XMVECTOR upPrime = Up;
+XMVECTOR camDiffX;
+XMFLOAT4 camAngleX;
+XMVECTOR camDiffY;
+XMFLOAT4 camAngleY;
 
 float ratio;
 float oldRatio;
