@@ -35,12 +35,8 @@ struct ConstantBuffer
 	XMMATRIX cProjection;
 	XMMATRIX cRotateY;
 	XMFLOAT4 cLightPos;
-	XMFLOAT4 cLightPos1;
 	XMFLOAT4 cLightDir;
-	XMFLOAT4 cLightDir1;
 	XMFLOAT4 cLightColor;
-	XMFLOAT4 cLightColor1;
-	XMFLOAT4 cOutputColor;
 	float cFloatScale;
 	float cRange;
 };
@@ -54,6 +50,15 @@ vector<unsigned  int> skyBoxIndicies;
 
 vector<Vertex> Ship;
 vector<unsigned  int> shipIndicies;
+
+vector<Vertex> Temple;
+vector<unsigned  int> templeIndicies;
+
+vector<Vertex> Bamboo;
+vector<unsigned  int> bambooIndicies;
+
+vector<Vertex> Terrain;
+vector<unsigned  int> terrainIndicies;
 
 
 XMMATRIX worldMatrix;
@@ -70,6 +75,7 @@ XMMATRIX sunMatrix;
 XMFLOAT4 LightDir[2];
 XMFLOAT4 LightColor[2];
 XMFLOAT4 OutputColor;
+XMFLOAT4 BambooPos[10];
 
 XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
 XMMATRIX tempWorld;
@@ -84,6 +90,10 @@ XMVECTOR camDiffX;
 XMFLOAT4 camAngleX;
 XMVECTOR camDiffY;
 XMFLOAT4 camAngleY;
+
+float scale = 1;
+
+bool sceneToggle = true;
 
 float ratio;
 float oldRatio;

@@ -20,15 +20,21 @@ class LetsDrawSomeStuff
 	ID3D11PixelShader *myLightPixelShader = nullptr;
 	ID3D11Buffer *myVertexBuffer = nullptr;
 	ID3D11Buffer *myShipVertexBuffer = nullptr;
+	ID3D11Buffer *myTempleVertexBuffer = nullptr;
+	ID3D11Buffer *myBambooVertexBuffer = nullptr;
+	ID3D11Buffer *myTerrainVertexBuffer = nullptr;
 	ID3D11Buffer *mySkyVertexBuffer = nullptr;
 	ID3D11Buffer *myIndexBuffer = nullptr;
 	ID3D11Buffer *myShipIndexBuffer = nullptr;
 	ID3D11Buffer *mySkyIndexBuffer = nullptr;
+	ID3D11Buffer *myTempleIndexBuffer = nullptr;
+	ID3D11Buffer *myBambooIndexBuffer = nullptr;
+	ID3D11Buffer *myTerrainIndexBuffer = nullptr;
 	ID3D11Buffer *myConstantBuffer = nullptr;
 	D3D11_VIEWPORT myPort;
 	D3D_DRIVER_TYPE myDriverType = D3D_DRIVER_TYPE_NULL;
 	
-	//Matricies
+	//Rasterizer States
 
 	ID3D11RasterizerState* mySkyboxRasterizerState = nullptr;
 	ID3D11RasterizerState* mySunRasterizerState = nullptr;
@@ -36,6 +42,9 @@ class LetsDrawSomeStuff
 	ID3D11RasterizerState* myMoonRasterizerState = nullptr;
 	ID3D11RasterizerState* myMarsRasterizerState = nullptr;
 	ID3D11RasterizerState* myShipRasterizerState = nullptr;
+	ID3D11RasterizerState* myTempleRasterizerState = nullptr;
+	ID3D11RasterizerState* myBambooRasterizerState = nullptr;
+	ID3D11RasterizerState* myTerrainRasterizerState = nullptr;
 	
 	ID3D11ShaderResourceView* noHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
@@ -47,6 +56,12 @@ class LetsDrawSomeStuff
 	ID3D11ShaderResourceView* marsShaderResource = nullptr;
 	ID3D11ShaderResourceView* marsHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* shipShaderResource = nullptr;
+	ID3D11ShaderResourceView* templeColorShaderResource = nullptr;
+	ID3D11ShaderResourceView* templeRoughShaderResource = nullptr;
+	ID3D11ShaderResourceView* templeNormalShaderResource = nullptr;
+	ID3D11ShaderResourceView* myBambooShaderResource = nullptr;
+	ID3D11ShaderResourceView* myTerrainShaderResource = nullptr;
+	ID3D11ShaderResourceView* myBlankShaderResource = nullptr;
 	ID3D11SamplerState* mySampler = nullptr;
 	
 	
@@ -124,7 +139,6 @@ FbxVector2 GetVertexUV(FbxGeometryElementUV* uvPtr, unsigned int VertexID, unsig
 
 void ProcessFbxMesh(FbxNode* Node, vector<Vertex>& verts, vector<unsigned int>& indicies)
 {
-	float scale = 1;
 	//FBX Mesh stuff
 	char header[100];
 	int childrenCount = Node->GetChildCount();
@@ -542,6 +556,99 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Process the scene and build DirectX Arrays
 			ProcessFbxMesh(lScene->GetRootNode(), SkyBox, skyBoxIndicies);
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "Assets/temple.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), Temple, templeIndicies);
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "Assets/bamboo.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), Bamboo, bambooIndicies);
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "Assets/Terrain.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), Terrain, terrainIndicies);
 			
 
 			//Create Input Layout
@@ -587,6 +694,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			hr = myDevice->CreateRasterizerState(&rDesc, &myMoonRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myMarsRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myShipRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myTempleRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myBambooRasterizerState);
 
 
 			//Vertex Planet Buffer
@@ -643,6 +752,60 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			subData.pSysMem = skyBoxIndicies.data();
 			myDevice->CreateBuffer(&bDesc, &subData, &mySkyIndexBuffer);
 
+			//Vertex temple Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * Temple.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = Temple.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &myTempleVertexBuffer);
+
+			//Index temple Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * templeIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = templeIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &myTempleIndexBuffer);
+
+			//Vertex bamboo Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * Bamboo.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = Bamboo.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &myBambooVertexBuffer);
+
+			//Index bamboo Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * bambooIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = bambooIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &myBambooIndexBuffer);
+
+			//Vertex Terrain Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * Terrain.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = Terrain.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &myTerrainVertexBuffer);
+
+			//Index Terrain Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * terrainIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = terrainIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &myTerrainIndexBuffer);
+
 			//Constant Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
 			bDesc.ByteWidth = sizeof(ConstantBuffer);
@@ -652,6 +815,9 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			//No Height
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/noHeightTexture.dds", nullptr, &noHeightShaderResource);
+
+			//Blank
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/blank.dds", nullptr, &myBlankShaderResource);
 
 			//Sun
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/sunTexture.dds", nullptr, &sunShaderResource);
@@ -673,6 +839,17 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Mars
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsTexture.dds", nullptr, &marsShaderResource);
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/marsHeightTexture.dds", nullptr, &marsHeightShaderResource);
+
+			//Temple
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/templeColorTexture.dds", nullptr, &templeColorShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/templeRoughTexture.dds", nullptr, &templeRoughShaderResource);
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/templeNormalTexture.dds", nullptr, &templeNormalShaderResource);
+
+			//Bamboo
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/bambooTexture.dds", nullptr, &myBambooShaderResource);
+			
+			//Terrain
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/terrainTexture.dds", nullptr, &myTerrainShaderResource);
 
 			// Create the sample state
 			D3D11_SAMPLER_DESC sampDesc = {};
@@ -701,6 +878,21 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//XMMATRIX skyScale = XMMatrixScaling(50.0f, 50.0f, 50.0f);
 			//skyMatrix = XMMatrixMultiply(skyMatrix,skyScale);
 
+			BambooPos[0].x = 11.0f;
+			BambooPos[0].z = -0.5f;
+
+			for (int i = 1; i < 3; i++) {
+				BambooPos[i].x = BambooPos[i - 1].x + 1.0f;
+				BambooPos[i].z = BambooPos[i - 1].z - 0.25f;
+			}
+			for (int i = 3; i < 7; i++) {
+				BambooPos[i].x = BambooPos[i - 1].x + 1.0f;
+				BambooPos[i].z = BambooPos[i - 1].z - 0.5f;
+			}
+			for (int i = 7; i < 10; i++) {
+				BambooPos[i].x = BambooPos[i - 1].x + 1.0f;
+				BambooPos[i].z = BambooPos[i - 1].z - 0.75f;
+			}
 		}
 	}
 }
@@ -719,6 +911,7 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	mySampler->Release();
 	myVertexBuffer->Release();
 	noHeightShaderResource->Release();
+	myBlankShaderResource->Release();
 
 	//Vertex Releases
 	myVertexShader->Release();
@@ -757,6 +950,25 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	skyboxShaderResource->Release();
 	mySkyboxRasterizerState->Release();
 
+	//temple Releases
+	myTempleVertexBuffer->Release();
+	myTempleIndexBuffer->Release();
+	templeColorShaderResource->Release();
+	templeRoughShaderResource->Release();
+	templeNormalShaderResource->Release();
+	myTempleRasterizerState->Release();
+
+	//Bamboo Releases
+	myBambooVertexBuffer->Release();
+	myBambooIndexBuffer->Release();
+	myBambooShaderResource->Release();
+	myBambooRasterizerState->Release();
+
+	//Terrain Releases
+	myTerrainVertexBuffer->Release();
+	myTerrainIndexBuffer->Release();
+	myTerrainShaderResource->Release();
+
 	// TODO: "Release()" more stuff here!
 	//delete &WorldMatrix;
 	//delete &ProjectionMatrix;
@@ -775,10 +987,8 @@ void LetsDrawSomeStuff::Render()
 	{		
 
 		if (ratio != mySurface->GetAspectRatio(ratio)) {
-			projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), ratio, 0.1f, 100.0f);
-		
+			projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(50.0f), ratio, 0.1f, 100.0f);		
 		}
-
 		// this could be changed during resolution edits, get it every frame
 		ID3D11RenderTargetView *myRenderTargetView = nullptr;
 		ID3D11DepthStencilView *myDepthStencilView = nullptr;
@@ -815,452 +1025,737 @@ void LetsDrawSomeStuff::Render()
 				curDeg = (timeCur - timeStart) / 1000.0f;
 			}
 
-
-
-			//////////////////////////////////////////////
-			// TODO: Set Up the Solar System parameters//
-			////////////////////////////////////////////
-
-			//Sun Position
-			XMFLOAT4 SunPos = { 0.0f, 0.0f, 0.0f, 1.0f };
-			//Sun Direction (Directional Light)
-			XMFLOAT4 SunDir = { 5.0f, 0.0f, 1.0f, 1.0f };
-			//Sun Color
-			XMFLOAT4 SunColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-			//Earth Position
-			XMFLOAT4 EarthPos = { 10.0f, 0.0f, 0.0f, 1.0f };
-			//Earth Color
-			XMFLOAT4 EarthColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-			//Moon Position
-			XMFLOAT4 MoonPos = { 7.0f, 0.0f, 0.0f, 1.0f };
-			//Moon Color
-			XMFLOAT4 MoonColor = { 1.0f, 0.5f, 0.5f, 0.5f };
-
-			//Mars Position
-			XMFLOAT4 MarsPos = { 25.0f, 0.0f, 0.0f, 1.0f };
-			//Mars Color
-			XMFLOAT4 MarsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-			//Ship Position
-			XMFLOAT4 ShipPos = { 27.0f, 0.0f, 0.0f, 1.0f };
-			//Ship Color
-			XMFLOAT4 ShipColor = { 0.0f, 1.0f, 1.0f, 1.0f };
-
-			//Spot Position
-			XMFLOAT4 SpotPos = { 0.0f, 0.0f, 100.0f, 1.0f };
-			//Spot Color
-			XMFLOAT4 SpotColor = { 1.0f, 0.0f, 1.0f, 1.0f };
-			//Sun Direction (Directional Light)
-			XMFLOAT4 SpotDir = { 5.0f, 0.0f, -1.0f, 1.0f };
-
-			//Tilt the Earth
-
-			//Rotate the Earth around the Axis
-
-			//earthMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&EarthPos));
-			GetCursorPos(p);
-			XMFLOAT4 eyeFloat, focusFloat;
-			XMStoreFloat4(&focusFloat, Focus);
-			XMStoreFloat4(&eyeFloat, Eye);
-
-			//W Key: Forward
-			if (GetAsyncKeyState('W')) {
-				eyeFloat.z += 0.01f;
-				focusFloat.z += 0.01f;
-			}
-
-			//A Key: Left
-			if (GetAsyncKeyState('A')) {
-				eyeFloat.x += -0.01f;
-				focusFloat.x += -0.01f;
-			}
-
-			//S Key: Backward
-			if (GetAsyncKeyState('S')) {
-				eyeFloat.z += -0.01f;
-				focusFloat.z += -0.01f;
-			}
-
-			//D Key: Right
-			if (GetAsyncKeyState('D')) {
-				eyeFloat.x += 0.01f;
-				focusFloat.x += 0.01f;
-			}
-
-			//Q Key: Rise
-			if (GetAsyncKeyState('Q')) {
-				eyeFloat.y += 0.01f;
-				focusFloat.y += 0.01f;
-			}
-
-			//E Key: Fall
-			if (GetAsyncKeyState('E')) {
-				eyeFloat.y += -0.01f;
-				focusFloat.y += -0.01f;
-			}
-			// * XMMatrixRotationX(camAngleX.x) * XMMatrixRotationY(camAngleY.y)
-
-			Eye = XMLoadFloat4(&eyeFloat);
-
-
-			////skyMatrix = camTranslate;
-			//viewMatrix = XMMatrixMultiply(viewMatrix, worldMatrix);
-			//
-			////W Key: Forward
-			//if (GetAsyncKeyState('W')) {
-			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, -0.01f), viewMatrix);
-			//}
-			//if (GetAsyncKeyState('A')) {
-			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.01f, 0.0f, 0.0f), viewMatrix);
-			//}
-			//if (GetAsyncKeyState('S')) {
-			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.01f), viewMatrix);
-			//}
-			//if (GetAsyncKeyState('D')) {
-			//	viewMatrix = XMMatrixMultiply(XMMatrixTranslation(-0.01f, 0.0f, 0.0f), viewMatrix);
-			//}
-
-			if (GetAsyncKeyState(VK_SHIFT)) {
-				if (p->y < posY) {
-					posY = p->y;
-					//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(0.5f)), viewMatrix);
-					focusFloat.y += 0.1f;
-				}
-
-				if (p->y > posY) {
-					posY = p->y;
-					//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-0.5f)), viewMatrix);
-					focusFloat.y += -0.1f;
-				}
-
-				if (p->x < posX) {
-					posX = p->x;
-					//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(0.5f)));
-					focusFloat.x += -0.1f;
-				}
-
-				if (p->x > posX) {
-					posX = p->x;
-					//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(-0.5f)));
-					focusFloat.x += 0.1f;
-				}
-			}
-			
-			Focus = XMLoadFloat4(&focusFloat);
-
-			viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
-			//XMFLOAT4X4 view4x4;
-			//XMStoreFloat4x4(&view4x4, viewMatrix);
-			//
-			//viewMatrix = XMMatrixMultiply(worldMatrix, viewMatrix);
-			skyMatrix = XMMatrixTranslationFromVector(Eye);
-			//
-			//XMFLOAT4X4 viewfloat;
-			//XMStoreFloat4x4(&viewfloat, camMatrix);
-			//camMatrix = XMLoadFloat4x4(&MoveCamera(viewfloat));
-
-			//XMFLOAT4X4 skyfloat;
-			//XMStoreFloat4x4(&skyfloat, camMatrix);
-			//camMatrix = XMLoadFloat4x4(&MoveSky(skyfloat));
-			//skyMatrix = XMMatrixMultiply(worldMatrix, camMatrix);
-
-			//Enter Key: Reset Camera
-			if (GetAsyncKeyState(VK_RETURN)) {
+			if (GetAsyncKeyState('2')&0x1) {
+				sceneToggle = !(sceneToggle);
+				curDeg = 0;
 				Eye = eyePrime;
 				Focus = focusPrime;
 				Up = upPrime;
 			}
 
-			XMMATRIX RotateLight = XMMatrixRotationY(-5.0*curDeg);
-			XMVECTOR LightVec = XMLoadFloat4(&SpotDir);
-			LightVec = XMVector3Transform(LightVec, RotateLight);
-			XMStoreFloat4(&SpotDir, LightVec);
+///////////////////////
+//Solar System Theme//
+/////////////////////
+#if 1
+
+			if (sceneToggle == false) {
+				scale = 1;
+				//////////////////////////////////////////////
+				// TODO: Set Up the Solar System parameters//
+				////////////////////////////////////////////
+#if 1
+			//Sun Position
+				XMFLOAT4 SunPos = { 0.0f, 0.0f, 0.0f, 1.0f };
+				//Sun Direction (Directional Light)
+				XMFLOAT4 SunDir = { 5.0f, 0.0f, 1.0f, 1.0f };
+				//Sun Color
+				XMFLOAT4 SunColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Earth Position
+				XMFLOAT4 EarthPos = { 10.0f, 0.0f, 0.0f, 1.0f };
+				//Earth Color
+				XMFLOAT4 EarthColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+				//Moon Position
+				XMFLOAT4 MoonPos = { 7.0f, 0.0f, 0.0f, 1.0f };
+				//Moon Color
+				XMFLOAT4 MoonColor = { 1.0f, 0.5f, 0.5f, 0.5f };
+
+				//Mars Position
+				XMFLOAT4 MarsPos = { 25.0f, 0.0f, 0.0f, 1.0f };
+				//Mars Color
+				XMFLOAT4 MarsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				//Ship Position
+				XMFLOAT4 ShipPos = { 27.0f, 0.0f, 0.0f, 1.0f };
+				//Ship Color
+				XMFLOAT4 ShipColor = { 0.0f, 1.0f, 1.0f, 1.0f };
+
+				//Spot Position
+				XMFLOAT4 SpotPos = { 0.0f, 0.0f, 100.0f, 1.0f };
+				//Spot Color
+				XMFLOAT4 SpotColor = { 1.0f, 0.0f, 1.0f, 1.0f };
+				//Sun Direction (Directional Light)
+				XMFLOAT4 SpotDir = { 5.0f, 0.0f, -1.0f, 1.0f };
+#endif // 1
+				//////////////////////////////////////
+				// TODO: Camera and Skybox Movement//
+				////////////////////////////////////
+#if 1
+				GetCursorPos(p);
+				XMFLOAT4 eyeFloat, focusFloat;
+				XMStoreFloat4(&focusFloat, Focus);
+				XMStoreFloat4(&eyeFloat, Eye);
+
+				//W Key: Forward
+				if (GetAsyncKeyState('W')) {
+					eyeFloat.z += 0.01f;
+					focusFloat.z += 0.01f;
+				}
+
+				//A Key: Left
+				if (GetAsyncKeyState('A')) {
+					eyeFloat.x += -0.01f;
+					focusFloat.x += -0.01f;
+				}
+
+				//S Key: Backward
+				if (GetAsyncKeyState('S')) {
+					eyeFloat.z += -0.01f;
+					focusFloat.z += -0.01f;
+				}
+
+				//D Key: Right
+				if (GetAsyncKeyState('D')) {
+					eyeFloat.x += 0.01f;
+					focusFloat.x += 0.01f;
+				}
+
+				//Q Key: Rise
+				if (GetAsyncKeyState('Q')) {
+					eyeFloat.y += 0.01f;
+					focusFloat.y += 0.01f;
+				}
+
+				//E Key: Fall
+				if (GetAsyncKeyState('E')) {
+					eyeFloat.y += -0.01f;
+					focusFloat.y += -0.01f;
+				}
+
+				Eye = XMLoadFloat4(&eyeFloat);
+
+				if (GetAsyncKeyState(VK_SHIFT)) {
+					if (p->y < posY) {
+						posY = p->y;
+						//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(0.5f)), viewMatrix);
+						focusFloat.y += 0.1f;
+					}
+
+					if (p->y > posY) {
+						posY = p->y;
+						//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-0.5f)), viewMatrix);
+						focusFloat.y += -0.1f;
+					}
+
+					if (p->x < posX) {
+						posX = p->x;
+						//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(0.5f)));
+						focusFloat.x += -0.1f;
+					}
+
+					if (p->x > posX) {
+						posX = p->x;
+						//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(-0.5f)));
+						focusFloat.x += 0.1f;
+					}
+				}
+
+				Focus = XMLoadFloat4(&focusFloat);
+
+				if (GetAsyncKeyState(VK_RETURN)) {
+					Eye = eyePrime;
+					Focus = focusPrime;
+					Up = upPrime;
+				}
+#endif //1
+
+				viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
+
+				skyMatrix = XMMatrixTranslationFromVector(Eye);
+
+				XMMATRIX RotateLight = XMMatrixRotationY(-5.0*curDeg);
+				XMVECTOR LightVec = XMLoadFloat4(&SpotDir);
+				LightVec = XMVector3Transform(LightVec, RotateLight);
+				XMStoreFloat4(&SpotDir, LightVec);
 
 
-			
-			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your Vertex & index buffers, Set your InputLayout & Topology & Draw!
-
+				/////////////////////////////////////////////////////////////////	
+				// TODO: Set your shaders, Update & Set your constant buffers,//
+				//Attatch your Vertex & index buffers,						 //
+				//Set your InputLayout & Topology & Draw!					//
+				/////////////////////////////////////////////////////////////
+#if 1
 			//Set Input Layout
-			myContext->IASetInputLayout(myInputLayout);
+				myContext->IASetInputLayout(myInputLayout);
 
-			//Set Primitive Topology
-			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				//Set Primitive Topology
+				myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			//Set Constant Buffer
-			ConstantBuffer constBuff;
-			constBuff.cWorld = XMMatrixTranspose(worldMatrix);
-			constBuff.cView = XMMatrixTranspose(viewMatrix);
-			constBuff.cProjection = XMMatrixTranspose(projectionMatrix);
-			constBuff.cRotateY = XMMatrixRotationY(0.0f);
-			constBuff.cLightPos = SunPos;
-			constBuff.cLightPos1 = SpotPos;
-			constBuff.cLightDir = SpotDir;
-			constBuff.cLightDir1 = SpotDir;
-			constBuff.cLightColor = XMFLOAT4(0,1,1,0);
-			constBuff.cLightColor1 = SpotColor;
-			constBuff.cOutputColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-			constBuff.cFloatScale = 0.0f;
-			constBuff.cRange = 50.0f;
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+				//Set Constant Buffer
+				ConstantBuffer constBuff;
+				constBuff.cWorld = XMMatrixTranspose(worldMatrix);
+				constBuff.cView = XMMatrixTranspose(viewMatrix);
+				constBuff.cProjection = XMMatrixTranspose(projectionMatrix);
+				constBuff.cRotateY = XMMatrixRotationY(0.0f);
+				constBuff.cLightPos = SunPos;
+				constBuff.cLightDir = SpotDir;
+				constBuff.cLightColor = SunColor;
+				constBuff.cFloatScale = 0.0f;
+				constBuff.cRange = 50.0f;
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+#endif //1
 
-			UINT skyStrides[] = { sizeof(Vertex) };
-			UINT skyOffsets[] = { 0 };
-			ID3D11Buffer *skyTempVB[] = { mySkyVertexBuffer };
+				////////////////////////
+				//TODO: Render SkyBox//
+				//////////////////////
+#if 1
+				UINT skyStrides[] = { sizeof(Vertex) };
+				UINT skyOffsets[] = { 0 };
+				ID3D11Buffer *skyTempVB[] = { mySkyVertexBuffer };
 
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, skyTempVB, skyStrides, skyOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(mySkyIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				myContext->RSSetState(mySkyboxRasterizerState);
+				constBuff.cWorld = XMMatrixTranspose(skyMatrix) * skyScale;
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+				myContext->VSSetSamplers(0, 1, &mySampler);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &skyboxShaderResource);
+				myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw SkyBox
+				myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+#endif //1
+
+				/////////////////////
+				//TODO: Render Sun//
+				///////////////////
+#if 1
+
+				UINT strides[] = { sizeof(Vertex) };
+				UINT offsets[] = { 0 };
+				ID3D11Buffer *tempVB[] = { myVertexBuffer };
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				myContext->RSSetState(mySunRasterizerState);
+
+				//Positioning and Scaling
+				sunMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&SunPos));
+				XMMATRIX sunScale = XMMatrixScaling(4.0f, 4.0f, 4.0f);
+				sunMatrix = sunScale * sunMatrix;
+
+				//Change Constant Buffer
+				constBuff.cWorld = XMMatrixTranspose(sunMatrix) * XMMatrixRotationY(0.5f * curDeg);
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &sunShaderResource);
+				myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Sun
+				myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+#endif //1
+
+				//////////////////////////
+				//TODO: Render the Ship//
+				////////////////////////
+#if 1
+				myContext->RSSetState(myShipRasterizerState);
+
+				UINT shipStrides[] = { sizeof(Vertex) };
+				UINT shipOffsets[] = { 0 };
+				ID3D11Buffer *shipTempVB[] = { myShipVertexBuffer };
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, shipTempVB, shipStrides, shipOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myShipIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				//Orbiting
+				XMVECTOR ShipVec = XMLoadFloat4(&ShipPos);
+				XMVECTOR oldFaceVec = ShipVec;
+				XMMATRIX RotateShip = XMMatrixRotationY(0.75f * curDeg);
+				ShipVec = XMVector3Transform(ShipVec, RotateShip);
+				XMVECTOR vecOfDiff = XMVector3AngleBetweenVectors(ShipVec, oldFaceVec);
+				XMFLOAT4 floatOfDiff;
+				XMStoreFloat4(&floatOfDiff, vecOfDiff);
+				XMStoreFloat4(&ShipPos, ShipVec);
+				printf("Current z position of ship: %f\n", ShipPos.z);
+
+
+				//Positioning and Scaling
+				//shipMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
+				shipMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+				if (ShipPos.z >= 0) {
+					shipMatrix *= XMMatrixRotationY(-floatOfDiff.y);
+				}
+				if (ShipPos.z < 0) {
+					shipMatrix *= XMMatrixRotationY(floatOfDiff.y);
+				}
+				XMMATRIX shipScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
+				shipMatrix = shipMatrix * XMMatrixTranslationFromVector(1.8f * XMLoadFloat4(&ShipPos)) * shipScale;
+				shipMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
+				//Rotate Around Axis
+
+				//Change Constant Buffer
+				constBuff.cLightDir = SunDir;
+				constBuff.cLightColor = SunColor;
+				constBuff.cWorld = XMMatrixTranspose(shipMatrix);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->PSSetShader(myPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &shipShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Ship
+				myContext->DrawIndexed(shipIndicies.size(), 0, 0);
+#endif //1
+
+				///////////////////////
+				//TODO: Render Earth//
+				/////////////////////
+#if 1
 			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, skyTempVB, skyStrides, skyOffsets);
+				myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
 
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(mySkyIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-			//TODO: Render SkyBox
-			myContext->RSSetState(mySkyboxRasterizerState);
-			constBuff.cWorld = XMMatrixTranspose(skyMatrix) * skyScale;
-			constBuff.cLightDir = XMFLOAT4{ 0,0,-1,0 };
-			constBuff.cLightColor = SunColor;
-			constBuff.cOutputColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+				myContext->RSSetState(myEarthRasterizerState);
 
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+				//Orbiting
+				XMMATRIX earthOrbit = XMMatrixRotationY(-0.027f * curDeg);
+				XMVECTOR earthOrbitVec = XMLoadFloat4(&EarthPos);
+				earthOrbitVec = XMVector3Transform(earthOrbitVec, earthOrbit);
+				XMStoreFloat4(&EarthPos, earthOrbitVec);
 
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
-			myContext->VSSetSamplers(0, 1, &mySampler);
+				//Postioning and Scaling
+				earthMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&EarthPos));
 
-			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				//Change Constant Buffer
+				constBuff.cWorld = XMMatrixTranspose(earthMatrix) * XMMatrixRotationY(-1.0f * curDeg);
+				constBuff.cFloatScale = 0.125f;
 
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
+				myContext->VSSetShaderResources(0, 1, &earthHeightShaderResource);
+				myContext->VSSetSamplers(0, 1, &mySampler);
 
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 
-			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &skyboxShaderResource);
-			myContext->PSSetSamplers(1, 1, &mySampler);
+				//Set Pixel Shader and Pixel Constant Buffer
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->PSSetShader(myPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &earthShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
 
-			//Draw SkyBox
-			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
-			
-			UINT strides[] = { sizeof(Vertex) };
-			UINT offsets[] = { 0 };
-			ID3D11Buffer *tempVB[] = { myVertexBuffer };
+				//Draw Earth
+				myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+#endif //1
 
-			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
+				//////////////////////////
+				//TODO: Render the Moon//
+				////////////////////////
+#if 1
+				myContext->RSSetState(myMoonRasterizerState);
 
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				//Orbiting
+				XMVECTOR MoonVec = XMLoadFloat4(&MoonPos);
+				XMVECTOR newEarthVec = XMLoadFloat4(&EarthPos);
+				XMMATRIX RotateMoon = XMMatrixRotationY(-0.037f * curDeg);
+				MoonVec = XMVector3Transform(MoonVec, RotateMoon);
+				XMStoreFloat4(&MoonPos, MoonVec);
 
-		//TODO: Render Sun
-			myContext->RSSetState(mySunRasterizerState);
-						
-			//Positioning and Scaling
-			sunMatrix = XMMatrixTranslationFromVector(1.0f * XMLoadFloat4(&SunPos));
-			XMMATRIX sunScale = XMMatrixScaling(4.0f, 4.0f, 4.0f);
-			sunMatrix = sunScale * sunMatrix;
+				//Positioning and Scaling
+				moonMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&MoonPos));
+				XMMATRIX moonScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
+				moonMatrix *= moonScale;
 
-			//Change Constant Buffer
-			constBuff.cLightDir = SpotDir;
-			constBuff.cLightColor = XMFLOAT4{ 0,1,1,1 };
-			constBuff.cWorld = XMMatrixTranspose(sunMatrix) * XMMatrixRotationY(0.5f * curDeg);
+				moonMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
+				//Rotate Around Axis
 
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+				//Change Constant Buffer
+				constBuff.cWorld = XMMatrixTranspose(moonMatrix) * XMMatrixRotationY(-0.037f * curDeg);
+				constBuff.cFloatScale = 0.02f;
 
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShaderResources(0, 1, &moonHeightShaderResource);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
 
-			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myLightPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &sunShaderResource);
-			myContext->PSSetSamplers(1, 1, &mySampler);
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 
-			//Draw Sun
-			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->PSSetShader(myPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &moonShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
 
-		//TODO: Render the Ship
-			myContext->RSSetState(myShipRasterizerState);
+				//Draw Moon
+				myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+#endif //1
 
-			UINT shipStrides[] = { sizeof(Vertex) };
-			UINT shipOffsets[] = { 0 };
-			ID3D11Buffer *shipTempVB[] = { myShipVertexBuffer };
+				//////////////////////
+				//TODO: Render Mars//
+				////////////////////
+#if 1
+				myContext->RSSetState(myMarsRasterizerState);
 
-			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, shipTempVB, shipStrides, shipOffsets);
+				//Orbiting
+				XMVECTOR marsOrbitVec = XMLoadFloat4(&MarsPos);
+				XMMATRIX marsOrbit = XMMatrixRotationY(-0.015f * curDeg);
+				marsOrbitVec = XMVector3Transform(marsOrbitVec, marsOrbit);
+				XMStoreFloat4(&MarsPos, marsOrbitVec);
 
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(myShipIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				//Postioning and Scaling
+				marsMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&MarsPos));
+				XMMATRIX marsScale = XMMatrixScaling(0.53f, 0.53f, 0.53f);
+				marsMatrix *= marsScale;
 
-			//Orbiting
-			XMVECTOR ShipVec = XMLoadFloat4(&ShipPos);
-			XMVECTOR oldFaceVec = ShipVec;
-			XMMATRIX RotateShip = XMMatrixRotationY(0.75f * curDeg);
-			ShipVec = XMVector3Transform(ShipVec, RotateShip);
-			XMVECTOR vecOfDiff = XMVector3AngleBetweenVectors(ShipVec, oldFaceVec);
-			XMFLOAT4 floatOfDiff;
-			XMStoreFloat4(&floatOfDiff, vecOfDiff);
-			XMStoreFloat4(&ShipPos, ShipVec);
-			printf("Current z position of ship: %f\n", ShipPos.z);
+				//Change Constant Buffer
+				constBuff.cWorld = XMMatrixTranspose(marsMatrix) * XMMatrixRotationY(1.026f * curDeg);
+				constBuff.cFloatScale = 0.05f;
+				//constBuff.cLightPos = ShipPos;
+				//constBuff.cLightColor = ShipColor;
 
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShaderResources(0, 1, &marsHeightShaderResource);
+				myContext->VSSetShader(myVertexShader, nullptr, 0);
 
-			//Positioning and Scaling
-			//shipMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&ShipPos));
-			shipMatrix = XMMatrixRotationX(XMConvertToRadians(-90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-			if (ShipPos.z >= 0) {
-				shipMatrix *= XMMatrixRotationY(-floatOfDiff.y);
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
+
+				//Set Pixel Shader and Pixel Constant Buffer
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->PSSetShader(myPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &marsShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Mars
+				myContext->DrawIndexed(planetIndicies.size(), 0, 0);
+#endif //1
 			}
-			if (ShipPos.z < 0) {
-				shipMatrix *= XMMatrixRotationY(floatOfDiff.y);
+#endif //1
+			
+///////////////////
+//Temple Theme//
+/////////////////
+#if 2
+			if (sceneToggle == true) {
+				scale = 50;
+				//////////////////////////////////////
+				// TODO: Camera and Skybox Movement//
+				////////////////////////////////////
+#if 1
+				GetCursorPos(p);
+				XMFLOAT4 eyeFloat, focusFloat;
+				XMStoreFloat4(&focusFloat, Focus);
+				XMStoreFloat4(&eyeFloat, Eye);
+
+				//W Key: Forward
+				if (GetAsyncKeyState('W')) {
+					eyeFloat.z += 0.01f;
+					focusFloat.z += 0.01f;
+				}
+
+				//A Key: Left
+				if (GetAsyncKeyState('A')) {
+					eyeFloat.x += -0.01f;
+					focusFloat.x += -0.01f;
+				}
+
+				//S Key: Backward
+				if (GetAsyncKeyState('S')) {
+					eyeFloat.z += -0.01f;
+					focusFloat.z += -0.01f;
+				}
+
+				//D Key: Right
+				if (GetAsyncKeyState('D')) {
+					eyeFloat.x += 0.01f;
+					focusFloat.x += 0.01f;
+				}
+
+				//Q Key: Rise
+				if (GetAsyncKeyState('Q')) {
+					eyeFloat.y += 0.01f;
+					focusFloat.y += 0.01f;
+				}
+
+				//E Key: Fall
+				if (GetAsyncKeyState('E')) {
+					eyeFloat.y += -0.01f;
+					focusFloat.y += -0.01f;
+				}
+
+				Eye = XMLoadFloat4(&eyeFloat);
+
+				if (GetAsyncKeyState(VK_SHIFT)) {
+					if (p->y < posY) {
+						posY = p->y;
+						//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(0.5f)), viewMatrix);
+						focusFloat.y += 0.1f;
+					}
+
+					if (p->y > posY) {
+						posY = p->y;
+						//viewMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-0.5f)), viewMatrix);
+						focusFloat.y += -0.1f;
+					}
+
+					if (p->x < posX) {
+						posX = p->x;
+						//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(0.5f)));
+						focusFloat.x += -0.1f;
+					}
+
+					if (p->x > posX) {
+						posX = p->x;
+						//viewMatrix = XMMatrixMultiply(viewMatrix, XMMatrixRotationY(XMConvertToRadians(-0.5f)));
+						focusFloat.x += 0.1f;
+					}
+				}
+
+				Focus = XMLoadFloat4(&focusFloat);
+
+				if (GetAsyncKeyState(VK_RETURN)) {
+					Eye = eyePrime;
+					Focus = focusPrime;
+					Up = upPrime;
+				}
+#endif //1
+
+				viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
+
+				//Set Input Layout
+				myContext->IASetInputLayout(myInputLayout);
+
+				//Set Primitive Topology
+				myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				//Set Constant Buffer
+				ConstantBuffer constBuff1;
+				constBuff1.cWorld = XMMatrixTranspose(worldMatrix);
+				constBuff1.cView = XMMatrixTranspose(viewMatrix);
+				constBuff1.cProjection = XMMatrixTranspose(projectionMatrix);
+				constBuff1.cRotateY = XMMatrixRotationY(0.0f);
+				constBuff1.cLightPos = XMFLOAT4{ 0.1f, 0.1f, 0.1f, 1.0f };
+				constBuff1.cLightDir = XMFLOAT4{ 0.1f, 0.1f, 1.0f, 1.0f };
+				constBuff1.cLightColor = XMFLOAT4{ 1,1,1,1 };
+				constBuff1.cFloatScale = 1.0f;
+				constBuff1.cRange = 50.0f;
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+			////////////////////////
+			//TODO: Render Temple//
+			//////////////////////
+
+				UINT templeStrides[] = { sizeof(Vertex) };
+				UINT templeOffsets[] = { 0 };
+				ID3D11Buffer *templeTempVB[] = { myTempleVertexBuffer };
+
+				XMMATRIX templeMatrix = XMMatrixIdentity();
+				templeMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(180.0f)), templeMatrix);
+				templeMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-90.0f)), templeMatrix);
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, templeTempVB, templeStrides, templeOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myTempleIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				myContext->RSSetState(myTempleRasterizerState);
+
+				//Change Constant Buffer
+				constBuff1.cWorld = XMMatrixTranspose(templeMatrix);
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShader(myVertexLightShader, nullptr, 0);
+				myContext->VSSetShaderResources(0, 1, &templeNormalShaderResource);
+				myContext->VSSetSamplers(0, 1, &mySampler);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &templeColorShaderResource);
+				myContext->PSSetShaderResources(1, 1, &templeRoughShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Temple
+				myContext->DrawIndexed(templeIndicies.size(), 0, 0);
+
+				//////////////////////////////
+				//TODO: Render Bamboo Right//
+				////////////////////////////
+
+				UINT bambooStrides[] = { sizeof(Vertex) };
+				UINT bambooOffsets[] = { 0 };
+				ID3D11Buffer *bambooTempVB[] = { myBambooVertexBuffer };
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, bambooTempVB, bambooStrides, bambooOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myBambooIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				myContext->RSSetState(myBambooRasterizerState);
+
+				for (int i = 0; i < 10; i++) {
+
+					XMMATRIX bambooMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&BambooPos[i]));
+
+					//Change Constant Buffer
+					constBuff1.cWorld = XMMatrixTranspose(bambooMatrix);
+
+					//Update Constant Buffer
+					myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+					//Set Vertex Shader and Vertex Constant Buffer
+					myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+					myContext->VSSetShader(myVertexLightShader, nullptr, 0);
+					myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+					myContext->VSSetSamplers(0, 1, &mySampler);
+
+					//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+					myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+					myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+					myContext->PSSetShaderResources(0, 1, &myBambooShaderResource);
+					myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+					myContext->PSSetSamplers(0, 1, &mySampler);
+
+					//Draw Temple
+					myContext->DrawIndexed(bambooIndicies.size(), 0, 0);
+				}
+
+			/////////////////////////////
+			//TODO: Render Bamboo Left//
+			///////////////////////////
+
+				UINT bambooStridesLeft[] = { sizeof(Vertex) };
+				UINT bambooOffsetsLeft[] = { 0 };
+				ID3D11Buffer *bambooTempVBLeft[] = { myBambooVertexBuffer };
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, bambooTempVBLeft, bambooStridesLeft, bambooOffsetsLeft);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myBambooIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				myContext->RSSetState(myBambooRasterizerState);
+
+				for (int i = 0; i < 10; i++) {
+
+					BambooPos[i].x *= -1.0f;
+
+					XMMATRIX bambooMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&BambooPos[i]));
+
+					//Change Constant Buffer
+					constBuff1.cWorld = XMMatrixTranspose(bambooMatrix);
+
+					//Update Constant Buffer
+					myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+					//Set Vertex Shader and Vertex Constant Buffer
+					myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+					myContext->VSSetShader(myVertexLightShader, nullptr, 0);
+					myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+					myContext->VSSetSamplers(0, 1, &mySampler);
+
+					//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+					myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+					myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+					myContext->PSSetShaderResources(0, 1, &myBambooShaderResource);
+					myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+					myContext->PSSetSamplers(0, 1, &mySampler);
+
+					//Draw Temple
+					myContext->DrawIndexed(bambooIndicies.size(), 0, 0);
+				}
+
+			////////////////////////
+			//TODO: Render Terrain//
+			//////////////////////
+
+				UINT terrainStrides[] = { sizeof(Vertex) };
+				UINT terrainOffsets[] = { 0 };
+				ID3D11Buffer *terrainTempVB[] = { myTerrainVertexBuffer };
+
+				XMMATRIX terrainMatrix = XMMatrixIdentity();
+				terrainMatrix = XMMatrixMultiply(XMMatrixScaling(0.25f,0.25f,0.25f), terrainMatrix);
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, terrainTempVB, terrainStrides, terrainOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myTerrainIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				myContext->RSSetState(myTerrainRasterizerState);
+
+				//Change Constant Buffer
+				constBuff1.cWorld = XMMatrixTranspose(terrainMatrix);
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShader(myVertexLightShader, nullptr, 0);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+				myContext->VSSetSamplers(0, 1, &mySampler);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &myTerrainShaderResource);
+				myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Temple
+				myContext->DrawIndexed(terrainIndicies.size(), 0, 0);
+
 			}
-			XMMATRIX shipScale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
-			shipMatrix = shipMatrix * XMMatrixTranslationFromVector(1.8f * XMLoadFloat4(&ShipPos)) * shipScale;
-			shipMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
-			//Rotate Around Axis
-
-			//Change Constant Buffer
-			constBuff.cLightDir = SunDir;
-			constBuff.cLightColor = SunColor;
-			constBuff.cWorld = XMMatrixTranspose(shipMatrix);
-
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-
-			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
-			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &shipShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
-
-			//Draw Ship
-			myContext->DrawIndexed(shipIndicies.size(), 0, 0);
-
-		//TODO: Render Earth
-
-			//Set Vertex Buffer
-			myContext->IASetVertexBuffers(0, 1, tempVB, strides, offsets);
-
-			//Set Index Buffer
-			myContext->IASetIndexBuffer(myIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-			myContext->RSSetState(myEarthRasterizerState);
-			
-			//Orbiting
-			XMMATRIX earthOrbit = XMMatrixRotationY(-0.027f * curDeg);
-			XMVECTOR earthOrbitVec = XMLoadFloat4(&EarthPos);
-			earthOrbitVec = XMVector3Transform(earthOrbitVec, earthOrbit);
-			XMStoreFloat4(&EarthPos, earthOrbitVec);
-
-			//Postioning and Scaling
-			earthMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&EarthPos));
-			
-			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(earthMatrix) * XMMatrixRotationY(-1.0f * curDeg);
-			constBuff.cFloatScale = 0.125f;
-
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-			myContext->VSSetShaderResources(0, 1, &earthHeightShaderResource);
-			myContext->VSSetSamplers(0, 1, &mySampler);
-
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-			
-			//Set Pixel Shader and Pixel Constant Buffer
-			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &earthShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
-
-			//Draw Earth
-			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
-
-		//TODO: Render the Moon
-			myContext->RSSetState(myMoonRasterizerState);
-
-			//Orbiting
-			XMVECTOR MoonVec = XMLoadFloat4(&MoonPos);
-			XMVECTOR newEarthVec = XMLoadFloat4(&EarthPos);
-			XMMATRIX RotateMoon = XMMatrixRotationY(-0.037f * curDeg);
-			MoonVec = XMVector3Transform(MoonVec, RotateMoon);
-			XMStoreFloat4(&MoonPos, MoonVec);
-
-			//Positioning and Scaling
-			moonMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&MoonPos));
-			XMMATRIX moonScale = XMMatrixScaling(0.2f, 0.2f, 0.2f);
-			moonMatrix *= moonScale;
-
-			moonMatrix *= XMMatrixTranslation(EarthPos.x, EarthPos.y, EarthPos.z);
-			//Rotate Around Axis
-
-			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(moonMatrix) * XMMatrixRotationY(-0.037f * curDeg);
-			constBuff.cFloatScale = 0.02f;
-
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShaderResources(0, 1, &moonHeightShaderResource);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-
-			//Set Pixel Shader, Pixel Constant Buffer, Shader Resource, and Sampler
-			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &moonShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
-
-			//Draw Moon
-			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
-
-		//TODO: Render Mars
-			myContext->RSSetState(myMarsRasterizerState);
-
-			//Orbiting
-			XMVECTOR marsOrbitVec = XMLoadFloat4(&MarsPos);
-			XMMATRIX marsOrbit = XMMatrixRotationY(-0.015f * curDeg);
-			marsOrbitVec = XMVector3Transform(marsOrbitVec, marsOrbit);
-			XMStoreFloat4(&MarsPos, marsOrbitVec);
-
-			//Postioning and Scaling
-			marsMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&MarsPos));
-			XMMATRIX marsScale = XMMatrixScaling(0.53f, 0.53f, 0.53f);
-			marsMatrix *= marsScale;
-
-			//Change Constant Buffer
-			constBuff.cWorld = XMMatrixTranspose(marsMatrix) * XMMatrixRotationY(1.026f * curDeg);
-			constBuff.cFloatScale = 0.05f;
-			//constBuff.cLightPos = ShipPos;
-			//constBuff.cLightColor = ShipColor;
-
-			//Set Vertex Shader and Vertex Constant Buffer
-			myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->VSSetShaderResources(0, 1, &marsHeightShaderResource);
-			myContext->VSSetShader(myVertexShader, nullptr, 0);
-
-			//Update Constant Buffer
-			myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
-
-			//Set Pixel Shader and Pixel Constant Buffer
-			myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
-			myContext->PSSetShader(myPixelShader, nullptr, 0);
-			myContext->PSSetShaderResources(0, 1, &marsShaderResource);
-			myContext->PSSetSamplers(0, 1, &mySampler);
-
-			//Draw Mars
-			myContext->DrawIndexed(planetIndicies.size(), 0, 0);
-
+#endif //2
 			mySwapChain->Present(0, 0); // set first argument to 1 to enable vertical refresh sync with display
 
 			// Free any temp DX handles aquired this frame
