@@ -23,6 +23,8 @@ struct InputVertex {
 	float2 uv : UV;
 	float3 norm : NORMAL;
 	float height : HEIGHT;
+	float4 tangent : TANGENT;
+	float4 biTangent : BITANGENT;
 };
 
 struct OutputVertex {
@@ -30,6 +32,8 @@ struct OutputVertex {
 	float2 uv : UV;
 	float3 norm : NORMAL;
 	float4 wPos : WORLDPOS;
+	float4 tangent : TANGENT;
+	float4 biTangent : BITANGENT;
 };
 
 
@@ -46,7 +50,9 @@ OutputVertex main(InputVertex input)
 	input.norm.x = heightTexture.GatherRed(heightSampler, input.uv);
 	input.norm.y = heightTexture.GatherGreen(heightSampler, input.uv);
 	input.norm.z = heightTexture.GatherBlue(heightSampler, input.uv);
-	output.norm = normalize(mul(float4(input.norm, 0), vsWorld).xyz);
+	output.norm = mul(float4(input.norm, 0), vsWorld).xyz;
+	output.tangent = mul(float4(input.tangent.xyz * input.tangent.w, 0), vsWorld);
+	output.biTangent = mul(float4(cross(input.norm.xyz, input.tangent.xyz), 0), vsWorld);
 	output.uv = input.uv;
 	return output;
 }

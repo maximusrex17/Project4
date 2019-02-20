@@ -23,6 +23,8 @@ struct InputVertex {
 	float2 uv : UV;
 	float3 norm : NORMAL;
 	float height : HEIGHT;
+	float4 tangent : TANGENT;
+	float4 biTangent : BITANGENT;
 };
 
 struct OutputVertex {
@@ -30,6 +32,8 @@ struct OutputVertex {
 	float2 uv : UV;
 	float3 norm : NORMAL;
 	float4 wPos : WORLDPOS;
+	float4 tangent : TANGENT;
+	float4 biTangent : BITANGENT;
 };
 
 
@@ -45,6 +49,8 @@ OutputVertex main(InputVertex input)
 	output.pos = mul(output.pos, vsView);
 	output.pos = mul(output.pos, vsProjection);
 	output.norm = normalize(mul(float4(input.norm, 0), vsWorld).xyz);
+	output.tangent = normalize(mul(input.tangent, vsWorld));
+	output.biTangent = normalize(mul(input.biTangent, vsWorld));
 	output.uv = input.uv;
 	return output;
 }

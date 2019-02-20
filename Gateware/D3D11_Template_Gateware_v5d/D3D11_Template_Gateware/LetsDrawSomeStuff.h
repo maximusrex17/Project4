@@ -16,6 +16,7 @@ class LetsDrawSomeStuff
 	ID3D11InputLayout *myInputLayout = nullptr;
 	ID3D11VertexShader *myVertexShader = nullptr;
 	ID3D11VertexShader *myVertexLightShader = nullptr;
+	ID3D11VertexShader *myVertexWaterShader = nullptr;
 	ID3D11PixelShader *myPixelShader = nullptr;
 	ID3D11PixelShader *myLightPixelShader = nullptr;
 	ID3D11Buffer *myVertexBuffer = nullptr;
@@ -289,23 +290,58 @@ void ProcessFbxMesh(FbxNode* Node, vector<Vertex>& verts, vector<unsigned int>& 
 						FbxGeometryElementTangent* leTangent = mesh->GetElementTangent(l);
 						FBXSDK_sprintf(header, 100, "            Tangent: ");
 
-						if (leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+						switch (leTangent->GetMappingMode())
 						{
+						case FbxGeometryElement::eByControlPoint:
 							switch (leTangent->GetReferenceMode())
 							{
 							case FbxGeometryElement::eDirect:
+								temp.tangent[0] = leTangent->GetDirectArray().GetAt(lControlPointIndex).mData[0];
+								temp.tangent[1] = leTangent->GetDirectArray().GetAt(lControlPointIndex).mData[1];
+								temp.tangent[2] = leTangent->GetDirectArray().GetAt(lControlPointIndex).mData[2];
+								temp.tangent[3] = leTangent->GetDirectArray().GetAt(lControlPointIndex).mData[3];
 								//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
 								break;
 							case FbxGeometryElement::eIndexToDirect:
 							{
-								//int id = leTangent->GetIndexArray().GetAt(vertexId);
+								int id = leTangent->GetIndexArray().GetAt(lControlPointIndex);
+
+								temp.tangent[0] = leTangent->GetDirectArray().GetAt(id).mData[0];
+								temp.tangent[1] = leTangent->GetDirectArray().GetAt(id).mData[1];
+								temp.tangent[2] = leTangent->GetDirectArray().GetAt(id).mData[2];
+								temp.tangent[3] = leTangent->GetDirectArray().GetAt(id).mData[3];
 								//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
 							}
 							break;
 							default:
 								break; // other reference modes not shown here!
 							}
-						}
+
+						case FbxGeometryElement::eByPolygonVertex:
+							switch(leTangent->GetReferenceMode())
+							{
+							case FbxGeometryElement::eDirect:
+								temp.tangent[0] = leTangent->GetDirectArray().GetAt(VertexId).mData[0];
+								temp.tangent[1] = leTangent->GetDirectArray().GetAt(VertexId).mData[1];
+								temp.tangent[2] = leTangent->GetDirectArray().GetAt(VertexId).mData[2];
+								temp.tangent[3] = leTangent->GetDirectArray().GetAt(VertexId).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
+								break;
+							case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leTangent->GetIndexArray().GetAt(VertexId);
+
+								temp.tangent[0] = leTangent->GetDirectArray().GetAt(id).mData[0];
+								temp.tangent[1] = leTangent->GetDirectArray().GetAt(id).mData[1];
+								temp.tangent[2] = leTangent->GetDirectArray().GetAt(id).mData[2];
+								temp.tangent[3] = leTangent->GetDirectArray().GetAt(id).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
+							}
+							break;
+							default:
+								break; // other reference modes not shown here!
+							}
+						};
 
 					}
 
@@ -315,24 +351,58 @@ void ProcessFbxMesh(FbxNode* Node, vector<Vertex>& verts, vector<unsigned int>& 
 
 						FbxGeometryElementBinormal* leBinormal = mesh->GetElementBinormal(l);
 
-						FBXSDK_sprintf(header, 100, "            Binormal: ");
-						if (leBinormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+						switch (leBinormal->GetMappingMode())
 						{
+						case FbxGeometryElement::eByControlPoint:
 							switch (leBinormal->GetReferenceMode())
 							{
 							case FbxGeometryElement::eDirect:
-								//Display3DVector(header, leBinormal->GetDirectArray().GetAt(vertexId));
+								temp.biTangent[0] = leBinormal->GetDirectArray().GetAt(lControlPointIndex).mData[0];
+								temp.biTangent[1] = leBinormal->GetDirectArray().GetAt(lControlPointIndex).mData[1];
+								temp.biTangent[2] = leBinormal->GetDirectArray().GetAt(lControlPointIndex).mData[2];
+								temp.biTangent[3] = leBinormal->GetDirectArray().GetAt(lControlPointIndex).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
 								break;
 							case FbxGeometryElement::eIndexToDirect:
 							{
-								//int id = leBinormal->GetIndexArray().GetAt(vertexId);
-								//Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
+								int id = leBinormal->GetIndexArray().GetAt(lControlPointIndex);
+
+								temp.biTangent[0] = leBinormal->GetDirectArray().GetAt(id).mData[0];
+								temp.biTangent[1] = leBinormal->GetDirectArray().GetAt(id).mData[1];
+								temp.biTangent[2] = leBinormal->GetDirectArray().GetAt(id).mData[2];
+								temp.biTangent[3] = leBinormal->GetDirectArray().GetAt(id).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
 							}
 							break;
 							default:
 								break; // other reference modes not shown here!
 							}
-						}
+
+						case FbxGeometryElement::eByPolygonVertex:
+							switch (leBinormal->GetReferenceMode())
+							{
+							case FbxGeometryElement::eDirect:
+								temp.biTangent[0] = leBinormal->GetDirectArray().GetAt(VertexId).mData[0];
+								temp.biTangent[1] = leBinormal->GetDirectArray().GetAt(VertexId).mData[1];
+								temp.biTangent[2] = leBinormal->GetDirectArray().GetAt(VertexId).mData[2];
+								temp.biTangent[3] = leBinormal->GetDirectArray().GetAt(VertexId).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
+								break;
+							case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leBinormal->GetIndexArray().GetAt(VertexId);
+
+								temp.biTangent[0] = leBinormal->GetDirectArray().GetAt(id).mData[0];
+								temp.biTangent[1] = leBinormal->GetDirectArray().GetAt(id).mData[1];
+								temp.biTangent[2] = leBinormal->GetDirectArray().GetAt(id).mData[2];
+								temp.biTangent[3] = leBinormal->GetDirectArray().GetAt(id).mData[3];
+								//Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
+							}
+							break;
+							default:
+								break; // other reference modes not shown here!
+							}
+						};
 					}
 
 					verts.push_back(temp);
@@ -451,6 +521,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Create Vertex Shader
 			myDevice->CreateVertexShader(VertexShader_PPIV, sizeof(VertexShader_PPIV), nullptr, &myVertexShader);
 			myDevice->CreateVertexShader(LightVertexShader_PPIV, sizeof(LightVertexShader_PPIV), nullptr, &myVertexLightShader);
+			myDevice->CreateVertexShader(WaterVertexShader_PPIV, sizeof(WaterVertexShader_PPIV), nullptr, &myVertexWaterShader);
 
 			//Create Pixel Shader
 			myDevice->CreatePixelShader(PixelShader_PPIV, sizeof(PixelShader_PPIV), nullptr, &myPixelShader);
@@ -657,6 +728,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 				{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 				{ "HEIGHT", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "BITANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			};
 
 			hr = myDevice->CreateInputLayout(ieDesc, ARRAYSIZE(ieDesc), VertexShader_PPIV, sizeof(VertexShader_PPIV), &myInputLayout);
@@ -1020,6 +1093,7 @@ void LetsDrawSomeStuff::Render()
 			{
 				static ULONGLONG timeStart = 0;
 				ULONGLONG timeCur = GetTickCount64();
+				timer = timeCur;
 				if (timeStart == 0)
 					timeStart = timeCur;
 				curDeg = (timeCur - timeStart) / 1000.0f;
@@ -1193,6 +1267,7 @@ void LetsDrawSomeStuff::Render()
 				constBuff.cLightColor = SunColor;
 				constBuff.cFloatScale = 0.0f;
 				constBuff.cRange = 50.0f;
+				constBuff.cTime = timer;
 				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff, 0, 0);
 #endif //1
 
@@ -1579,6 +1654,7 @@ void LetsDrawSomeStuff::Render()
 				constBuff1.cLightColor = XMFLOAT4{ 1,1,1,1 };
 				constBuff1.cFloatScale = 1.0f;
 				constBuff1.cRange = 50.0f;
+				constBuff1.cTime = timer;
 				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
 
 			////////////////////////
@@ -1609,7 +1685,7 @@ void LetsDrawSomeStuff::Render()
 				//Set Vertex Shader and Vertex Constant Buffer
 				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
 				myContext->VSSetShader(myVertexLightShader, nullptr, 0);
-				myContext->VSSetShaderResources(0, 1, &templeNormalShaderResource);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
 				myContext->VSSetSamplers(0, 1, &mySampler);
 
 				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
@@ -1618,6 +1694,7 @@ void LetsDrawSomeStuff::Render()
 				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 				myContext->PSSetShaderResources(0, 1, &templeColorShaderResource);
 				myContext->PSSetShaderResources(1, 1, &templeRoughShaderResource);
+				myContext->PSSetShaderResources(2, 1, &templeNormalShaderResource);
 				myContext->PSSetSamplers(0, 1, &mySampler);
 
 				//Draw Temple
@@ -1661,6 +1738,7 @@ void LetsDrawSomeStuff::Render()
 					myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 					myContext->PSSetShaderResources(0, 1, &myBambooShaderResource);
 					myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+					myContext->PSSetShaderResources(2, 1, &myBlankShaderResource);
 					myContext->PSSetSamplers(0, 1, &mySampler);
 
 					//Draw Temple
@@ -1707,15 +1785,16 @@ void LetsDrawSomeStuff::Render()
 					myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 					myContext->PSSetShaderResources(0, 1, &myBambooShaderResource);
 					myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+					myContext->PSSetShaderResources(2, 1, &myBlankShaderResource);
 					myContext->PSSetSamplers(0, 1, &mySampler);
 
 					//Draw Temple
 					myContext->DrawIndexed(bambooIndicies.size(), 0, 0);
 				}
 
-			////////////////////////
+			/////////////////////////
 			//TODO: Render Terrain//
-			//////////////////////
+			///////////////////////
 
 				UINT terrainStrides[] = { sizeof(Vertex) };
 				UINT terrainOffsets[] = { 0 };
@@ -1739,7 +1818,7 @@ void LetsDrawSomeStuff::Render()
 
 				//Set Vertex Shader and Vertex Constant Buffer
 				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-				myContext->VSSetShader(myVertexLightShader, nullptr, 0);
+				myContext->VSSetShader(myVertexWaterShader, nullptr, 0);
 				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
 				myContext->VSSetSamplers(0, 1, &mySampler);
 
@@ -1749,6 +1828,7 @@ void LetsDrawSomeStuff::Render()
 				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
 				myContext->PSSetShaderResources(0, 1, &myTerrainShaderResource);
 				myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+				myContext->PSSetShaderResources(2, 1, &myBlankShaderResource);
 				myContext->PSSetSamplers(0, 1, &mySampler);
 
 				//Draw Temple

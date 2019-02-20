@@ -7,6 +7,7 @@
 #include"VertexShader_PPIV.csh"
 #include"PixelShader_PPIV.csh"
 #include"LightVertexShader_PPIV.csh"
+#include"WaterVertexShader_PPIV.csh"
 #include"LightPixelShader_PPIV.csh"
 #include "VertexShader.h"
 #include <directxmath.h>
@@ -15,6 +16,7 @@
 #include "DDSTextureLoader.h"
 #include "fbxsdk.h"
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 using namespace DirectX;
@@ -25,7 +27,8 @@ struct Vertex {
 	float pos[4];
 	float UV[2];
 	float norm[3];
-	//float color[4];
+	float tangent[4];
+	float biTangent[4];
 };
 
 struct ConstantBuffer
@@ -39,6 +42,7 @@ struct ConstantBuffer
 	XMFLOAT4 cLightColor;
 	float cFloatScale;
 	float cRange;
+	float cTime;
 };
 
 //Vectors for Objects
@@ -90,6 +94,8 @@ XMVECTOR camDiffX;
 XMFLOAT4 camAngleX;
 XMVECTOR camDiffY;
 XMFLOAT4 camAngleY;
+
+float timer = 0;
 
 float scale = 1;
 

@@ -18,6 +18,8 @@ struct OutputVertex {
 	float2 uv : UV;
 	float3 norm : NORMAL;
 	float4 wPos : WORLDPOS;
+	float4 tangent : TANGENT;
+	float4 biTangent : BITANGENT;
 };
 
 float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
