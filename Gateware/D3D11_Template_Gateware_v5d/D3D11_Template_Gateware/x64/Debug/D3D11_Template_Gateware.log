@@ -1,6 +1,4 @@
-﻿  compilation header save succeeded; see C:\Users\gillj\Desktop\Project4\Gateware\D3D11_Template_Gateware_v5d\D3D11_Template_Gateware\WaterVertexShader_PPIV.csh
-  compilation object save succeeded; see C:\Users\gillj\Desktop\Project4\Gateware\D3D11_Template_Gateware_v5d\x64\Debug\WaterVertexShader_PPIV.cso
-  main.cpp
+﻿  main.cpp
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(37): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(38): warning C4305: 'argument': truncation from 'double' to 'float'
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\cameracontrols.h(43): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
@@ -57,36 +55,36 @@ c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_templ
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(396): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(397): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
 c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(398): warning C4244: '=': conversion from 'fbxsdk::FbxDouble' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(776): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(786): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(794): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(804): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(812): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(822): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(830): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(840): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(848): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(858): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(866): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(876): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1096): warning C4244: '=': conversion from 'ULONGLONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1204): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1210): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1216): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1222): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1241): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1308): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1352): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1417): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1461): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1504): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1545): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1605): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1611): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1617): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1623): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1701): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1745): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1792): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
-c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1835): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(777): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(787): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(795): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(805): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(813): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(823): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(831): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(841): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(849): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(859): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(867): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(877): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1100): warning C4244: '=': conversion from 'ULONGLONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1208): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1214): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1220): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1226): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1245): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1312): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1356): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1421): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1465): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1508): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1549): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1609): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1615): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1621): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1627): warning C4244: '=': conversion from 'LONG' to 'float', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1705): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1749): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1796): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+c:\users\gillj\desktop\project4\gateware\d3d11_template_gateware_v5d\d3d11_template_gateware\letsdrawsomestuff.h(1839): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
   D3D11_Template_Gateware.vcxproj -> C:\Users\gillj\Desktop\Project4\Gateware\D3D11_Template_Gateware_v5d\x64\Debug\D3D11_Template_Gateware.exe

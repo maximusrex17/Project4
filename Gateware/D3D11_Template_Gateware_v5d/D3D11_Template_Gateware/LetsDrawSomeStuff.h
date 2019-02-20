@@ -769,6 +769,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			hr = myDevice->CreateRasterizerState(&rDesc, &myShipRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myTempleRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myBambooRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myTerrainRasterizerState);
 
 
 			//Vertex Planet Buffer
@@ -985,6 +986,7 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myVertexBuffer->Release();
 	noHeightShaderResource->Release();
 	myBlankShaderResource->Release();
+	myVertexWaterShader->Release();
 
 	//Vertex Releases
 	myVertexShader->Release();
@@ -1036,11 +1038,13 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myBambooIndexBuffer->Release();
 	myBambooShaderResource->Release();
 	myBambooRasterizerState->Release();
+	
 
 	//Terrain Releases
 	myTerrainVertexBuffer->Release();
 	myTerrainIndexBuffer->Release();
 	myTerrainShaderResource->Release();
+	myTerrainRasterizerState->Release();
 
 	// TODO: "Release()" more stuff here!
 	//delete &WorldMatrix;
