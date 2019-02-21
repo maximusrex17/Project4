@@ -1,7 +1,7 @@
 Texture2D txDiffuse : register(t0);
 Texture2D txRough : register(t1);
 Texture2D txNorm : register(t2);
-SamplerState samLinear : register(s1);
+SamplerState samLinear : register(s0);
 
 cbuffer ConstantBuffer : register(b0) {
 	matrix vsWorld;

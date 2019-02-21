@@ -887,6 +887,9 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			bDesc.CPUAccessFlags = 0;
 			hr = myDevice->CreateBuffer(&bDesc, nullptr, &myConstantBuffer);
 
+
+			myDevice->QueryInterface((&debugDevice));
+
 			//No Height
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/noHeightTexture.dds", nullptr, &noHeightShaderResource);
 
@@ -1018,6 +1021,8 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	//Ship Releases
 	shipShaderResource->Release();
 	myShipRasterizerState->Release();
+	myShipIndexBuffer->Release();
+	myShipVertexBuffer->Release();
 
 	//Skybox Releases
 	mySkyVertexBuffer->Release();
@@ -1055,6 +1060,7 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		mySurface->DecrementCount(); // reduce internal count (will auto delete on Zero)
 		mySurface = nullptr; // the safest way to fly
 	}
+	debugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 }
 
 // Draw

@@ -25,7 +25,7 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
-// samLinear                         sampler      NA          NA             s1      1 
+// samLinear                         sampler      NA          NA             s0      1 
 // txDiffuse                         texture  float4          2d             t0      1 
 // txRough                           texture  float4          2d             t1      1 
 // txNorm                            texture  float4          2d             t2      1 
@@ -54,7 +54,7 @@
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[19], immediateIndexed
-dcl_sampler s1, mode_default
+dcl_sampler s0, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
@@ -76,7 +76,7 @@ dcl_temps 4
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
 #line 39 "C:\Users\gillj\Desktop\Project4\Gateware\D3D11_Template_Gateware_v5d\D3D11_Template_Gateware\LightPixelShader_PPIV.hlsl"
-sample_indexable(texture2d)(float,float,float,float) r0.xyz, v1.xyxx, t2.xyzw, s1
+sample_indexable(texture2d)(float,float,float,float) r0.xyz, v1.xyxx, t2.xyzw, s0
 mov r0.xyz, r0.xyzx  // r0.x <- surfaceNorm.x; r0.y <- surfaceNorm.y; r0.z <- surfaceNorm.z
 
 #line 40
@@ -101,10 +101,10 @@ mul r1.xyz, r0.zzzz, r3.xyzx
 add r0.xyz, r0.xywx, r1.xyzx
 
 #line 52
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t0.xyzw, s1  // r1.x <- surfaceColor.x; r1.y <- surfaceColor.y; r1.z <- surfaceColor.z; r1.w <- surfaceColor.w
+sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t0.xyzw, s0  // r1.x <- surfaceColor.x; r1.y <- surfaceColor.y; r1.z <- surfaceColor.z; r1.w <- surfaceColor.w
 
 #line 53
-sample_indexable(texture2d)(float,float,float,float) r2.xyzw, v1.xyxx, t1.xyzw, s1  // r2.x <- roughColor.x; r2.y <- roughColor.y; r2.z <- roughColor.z; r2.w <- roughColor.w
+sample_indexable(texture2d)(float,float,float,float) r2.xyzw, v1.xyxx, t1.xyzw, s0  // r2.x <- roughColor.x; r2.y <- roughColor.y; r2.z <- roughColor.z; r2.w <- roughColor.w
 
 #line 54
 mov r3.xyzw, -v3.xyzw
@@ -135,10 +135,10 @@ ret
 
 const BYTE LightPixelShader_PPIV[] =
 {
-     68,  88,  66,  67, 248, 191, 
-     33, 177, 226, 222,  20, 187, 
-    177, 195, 248,  13, 137, 222, 
-    239,   0,   1,   0,   0,   0, 
+     68,  88,  66,  67,  90, 224, 
+     70, 217, 199, 108, 238,  97, 
+    194, 213, 234, 242,  88, 152, 
+    198, 146,   1,   0,   0,   0, 
     160,  79,   0,   0,   6,   0, 
       0,   0,  56,   0,   0,   0, 
     220,   3,   0,   0, 176,   4, 
@@ -159,7 +159,7 @@ const BYTE LightPixelShader_PPIV[] =
       0,   0,   3,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
-      1,   0,   0,   0,   1,   0, 
+      0,   0,   0,   0,   1,   0, 
       0,   0,   1,   0,   0,   0, 
     230,   0,   0,   0,   2,   0, 
       0,   0,   5,   0,   0,   0, 
@@ -351,7 +351,7 @@ const BYTE LightPixelShader_PPIV[] =
      32,   0,   0,   0,   0,   0, 
      19,   0,   0,   0,  90,   0, 
       0,   3,   0,  96,  16,   0, 
-      1,   0,   0,   0,  88,  24, 
+      0,   0,   0,   0,  88,  24, 
       0,   4,   0, 112,  16,   0, 
       0,   0,   0,   0,  85,  85, 
       0,   0,  88,  24,   0,   4, 
@@ -379,7 +379,7 @@ const BYTE LightPixelShader_PPIV[] =
       0,   0,  70,  16,  16,   0, 
       1,   0,   0,   0,  70, 126, 
      16,   0,   2,   0,   0,   0, 
-      0,  96,  16,   0,   1,   0, 
+      0,  96,  16,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
     114,   0,  16,   0,   0,   0, 
       0,   0,  70,   2,  16,   0, 
@@ -440,14 +440,14 @@ const BYTE LightPixelShader_PPIV[] =
      70,  16,  16,   0,   1,   0, 
       0,   0,  70, 126,  16,   0, 
       0,   0,   0,   0,   0,  96, 
-     16,   0,   1,   0,   0,   0, 
+     16,   0,   0,   0,   0,   0, 
      69,   0,   0, 139, 194,   0, 
       0, 128,  67,  85,  21,   0, 
     242,   0,  16,   0,   2,   0, 
       0,   0,  70,  16,  16,   0, 
       1,   0,   0,   0,  70, 126, 
      16,   0,   1,   0,   0,   0, 
-      0,  96,  16,   0,   1,   0, 
+      0,  96,  16,   0,   0,   0, 
       0,   0,  54,   0,   0,   6, 
     242,   0,  16,   0,   3,   0, 
       0,   0,  70,  30,  16, 128, 
@@ -973,10 +973,10 @@ const BYTE LightPixelShader_PPIV[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0, 148,  46,  49,   1, 
-    114, 194, 108,  92,   1,   0, 
-      0,   0,  34, 233,   6,   1, 
-      3, 152, 160,  66, 161,  84, 
-    249, 217, 180, 110,  90,  93, 
+    213,   8, 111,  92,   1,   0, 
+      0,   0, 103,  57,  77, 151, 
+    118, 111, 157,  68, 152, 195, 
+     45, 137, 250, 196,  37, 166, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   1,   0,   0,   0, 
       1,   0,   0,   0,   0,   0, 
@@ -1149,9 +1149,9 @@ const BYTE LightPixelShader_PPIV[] =
       2,   0,  28,  19,   2,   0, 
      65,  36,   1,   0, 236, 179, 
       1,   0,  45, 242,   3,   0, 
-    205, 127,   3,   0, 206,  55, 
+     19, 207,   1,   0, 206,  55, 
       0,   0,  57, 206,   1,   0, 
-    191, 237,   2,   0,  90,  28, 
+    137,  62,   0,   0,  90,  28, 
       0,   0, 177, 197,   0,   0, 
       9, 241,   2,   0,   0,  16, 
       0,   0,   0,   0,   0,   0, 
@@ -1251,7 +1251,7 @@ const BYTE LightPixelShader_PPIV[] =
      32, 115,  97, 109,  76, 105, 
     110, 101,  97, 114,  32,  58, 
      32, 114, 101, 103, 105, 115, 
-    116, 101, 114,  40, 115,  49, 
+    116, 101, 114,  40, 115,  48, 
      41,  59,  13,  10,  13,  10, 
      99,  98, 117, 102, 102, 101, 
     114,  32,  67, 111, 110, 115, 
@@ -1635,7 +1635,7 @@ const BYTE LightPixelShader_PPIV[] =
      97, 109,  76, 105, 110, 101, 
      97, 114,  32,  58,  32, 114, 
     101, 103, 105, 115, 116, 101, 
-    114,  40, 115,  49,  41,  59, 
+    114,  40, 115,  48,  41,  59, 
      13,  10,  13,  10,  99,  98, 
     117, 102, 102, 101, 114,  32, 
      67, 111, 110, 115, 116,  97, 
@@ -1656,8 +1656,8 @@ const BYTE LightPixelShader_PPIV[] =
      10,   9, 109,  97, 116, 114, 
     105, 120,  32, 118, 115,  82, 
      27, 226,  48,   1, 128,   0, 
-      0,   0,  13, 202, 169,  57, 
-    200, 200, 212,   1,   1,   0, 
+      0,   0,  38, 132, 136,  90, 
+     35, 202, 212,   1,   1,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -1671,7 +1671,7 @@ const BYTE LightPixelShader_PPIV[] =
       0,   0,   0,   0,   0,   0, 
     122,   0,   0,   0,  40,   0, 
       0,   0,  27, 226,  48,   1, 
-    198,  99,  36, 198, 116,   7, 
+    131, 118,  10,  24, 116,   7, 
       0,   0,   1,   0,   0,   0, 
     121,   0,   0,   0, 122,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -2076,9 +2076,9 @@ const BYTE LightPixelShader_PPIV[] =
       2,   0,   6,   0, 244,   0, 
       0,   0,  24,   0,   0,   0, 
       1,   0,   0,   0,  16,   1, 
-     11, 225, 195, 213,  47, 105, 
-    105, 125,  91,  81,  84, 146, 
-    215, 230, 107, 201,   0,   0, 
+     46,  93, 221,  78, 210,  93, 
+    184, 189, 164,  32,   1,  46, 
+     19, 210, 246,  64,   0,   0, 
     242,   0,   0,   0, 232,   2, 
       0,   0,   0,   0,   0,   0, 
       1,   0,   1,   0,  16,   4, 
@@ -2311,14 +2311,14 @@ const BYTE LightPixelShader_PPIV[] =
       0, 102, 108, 111,  97, 116, 
      51, 120,  51,   0,  14,   0, 
      23,  21,   0,  16,   0,   0, 
-      3,   2, 192,  15,   0,   0, 
+      3,   2,   0,  98,   0,   0, 
     242, 241,  10,   0,  24,  21, 
       9,  16,   0,   0,   1,   0, 
       1,   0,  10,   0,  24,  21, 
      10,  16,   0,   0,   1,   0, 
       0,   2,  14,   0,  23,  21, 
       0,   0,   0,   0,  10,   2, 
-    192,  15,   0,   0, 242, 241, 
+      0,  98,   0,   0, 242, 241, 
      10,   0,  24,  21,  12,  16, 
       0,   0,   1,   0,   1,   0, 
      10,   0,  24,  21,  13,  16, 
@@ -2614,10 +2614,10 @@ const BYTE LightPixelShader_PPIV[] =
     108,  67, 111, 108, 111, 114, 
      59,  13,  10, 125,   0,   7, 
       0,   0,   0,   0,   0,   0, 
-      0, 121,   0,   0,   0,   0, 
+      0, 121,   0,   0,   0, 242, 
       0,   0,   0,   0,   0,   0, 
       0,   1,   0,   0,   0, 122, 
-      0,   0,   0, 242,   0,   0, 
+      0,   0,   0,   0,   0,   0, 
       0,   4,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -2955,7 +2955,7 @@ const BYTE LightPixelShader_PPIV[] =
      78, 111, 114, 109,   0,   0, 
      30,   0,  81,  17,  14,  16, 
       0,   0,   6,   0, 255, 255, 
-    255, 255, 255, 255,   1,   0, 
+    255, 255, 255, 255,   0,   0, 
     255, 255, 115,  97, 109,  76, 
     105, 110, 101,  97, 114,   0, 
       0,   0,  30,   0,  81,  17, 
@@ -3125,7 +3125,7 @@ const BYTE LightPixelShader_PPIV[] =
       9,   0, 208,   7,   0,   0, 
       0,   0,   0,   0,  28,   3, 
       0,   0,   1,   0,   0,   0, 
-     72, 126, 231,   3,   0,   0, 
+    200, 125, 210,   3,   0,   0, 
       0,   0,   0,   0,   0,   0, 
     109,  97, 105, 110,   0, 110, 
     111, 110, 101,   0,   0,   0, 
@@ -3191,11 +3191,11 @@ const BYTE LightPixelShader_PPIV[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
-    148,  46,  49,   1, 114, 194, 
-    108,  92,   1,   0,   0,   0, 
-     34, 233,   6,   1,   3, 152, 
-    160,  66, 161,  84, 249, 217, 
-    180, 110,  90,  93, 165,   0, 
+    148,  46,  49,   1, 213,   8, 
+    111,  92,   1,   0,   0,   0, 
+    103,  57,  77, 151, 118, 111, 
+    157,  68, 152, 195,  45, 137, 
+    250, 196,  37, 166, 165,   0, 
       0,   0,  47,  76, 105, 110, 
     107,  73, 110, 102, 111,   0, 
      47, 110,  97, 109, 101, 115, 

@@ -22,6 +22,7 @@ using namespace std;
 using namespace DirectX;
 
 #define RAND_NORMAL XMFLOAT3(rand()/float(RAND_MAX),rand()/float(RAND_MAX),rand()/float(RAND_MAX))
+#define _DEGBUG
 
 struct Vertex {
 	float pos[4];
@@ -118,3 +119,7 @@ float timeSpent = 0, curDeg = 0, posX = 0, posY = 0;
 //SkyBox Position
 XMFLOAT4 SkyPos = { 0,0,0,1 };
 XMFLOAT4 DynSkyPos = { 1,0,0,1 };
+
+ID3D11Debug* debugDevice;
+
+
