@@ -9,6 +9,7 @@
 #include"LightVertexShader_PPIV.csh"
 #include"WaterVertexShader_PPIV.csh"
 #include"LightPixelShader_PPIV.csh"
+#include"MultiTexturePixelShader_PPIV.csh"
 #include "VertexShader.h"
 #include <directxmath.h>
 #include <vector>
@@ -16,7 +17,6 @@
 #include "DDSTextureLoader.h"
 #include "fbxsdk.h"
 #include <iostream>
-#include <time.h>
 
 using namespace std;
 using namespace DirectX;
@@ -64,6 +64,9 @@ vector<unsigned  int> bambooIndicies;
 
 vector<Vertex> Terrain;
 vector<unsigned  int> terrainIndicies;
+
+vector<Vertex> Water;
+vector<unsigned  int> waterIndicies;
 
 
 XMMATRIX worldMatrix;

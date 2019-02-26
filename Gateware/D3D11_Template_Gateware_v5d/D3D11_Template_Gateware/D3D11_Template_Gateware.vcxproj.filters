@@ -64,11 +64,13 @@
     <FxCompile Include="LightVertexShader_PPIV.hlsl" />
     <FxCompile Include="LightPixelShader_PPIV.hlsl" />
     <FxCompile Include="WaterVertexShader_PPIV.hlsl" />
+    <FxCompile Include="MultiTexturePixelShader_PPIV.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\planet.fbx" />
     <None Include="skybox.FBX" />
     <None Include="Terrain.FBX" />
+    <None Include="Assets\water.FBX" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="noHeightTexture.DDS" />

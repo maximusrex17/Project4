@@ -43,9 +43,9 @@ OutputVertex main(InputVertex input)
 {
 	OutputVertex output = (OutputVertex)0;
 	output.pos = mul(input.pos, vsWorld);
-	//CubeLookUpX += sin(CubeLookUpY * 200 + (TIME * 5)) * 0.005 * (CubeLookUpY – 1);
-	output.pos.x += sin(output.pos.y * 200 + (vsTime * 5)) * 0.005f * (output.pos.y - 1);
-	output.pos.y += sin(output.pos.x * 200 + (vsTime * 5)) * 0.005f * (output.pos.x - 1);
+	//CubeLookUpX += sin(CubeLookUpY * 200 + (TIME * 5)) * 0.005 * (CubeLookUpY - 1);
+	output.pos.x += sin(output.pos.y * 200 + (vsTime * 5)) * 0.0025f * (output.pos.y - 10);
+	output.pos.y += sin(output.pos.x * 200 + (vsTime * 5)) * 0.0025f * (output.pos.x - 10);
 	//input.height = heightTexture.GatherRed(heightSampler, input.uv);
 	//output.pos.xyz += (input.height*vsFloatScale);
 	output.wPos = output.pos;

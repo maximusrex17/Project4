@@ -19,11 +19,13 @@ class LetsDrawSomeStuff
 	ID3D11VertexShader *myVertexWaterShader = nullptr;
 	ID3D11PixelShader *myPixelShader = nullptr;
 	ID3D11PixelShader *myLightPixelShader = nullptr;
+	ID3D11PixelShader *myMultiTexturePixelShader = nullptr;
 	ID3D11Buffer *myVertexBuffer = nullptr;
 	ID3D11Buffer *myShipVertexBuffer = nullptr;
 	ID3D11Buffer *myTempleVertexBuffer = nullptr;
 	ID3D11Buffer *myBambooVertexBuffer = nullptr;
 	ID3D11Buffer *myTerrainVertexBuffer = nullptr;
+	ID3D11Buffer *myWaterVertexBuffer = nullptr;
 	ID3D11Buffer *mySkyVertexBuffer = nullptr;
 	ID3D11Buffer *myIndexBuffer = nullptr;
 	ID3D11Buffer *myShipIndexBuffer = nullptr;
@@ -31,6 +33,7 @@ class LetsDrawSomeStuff
 	ID3D11Buffer *myTempleIndexBuffer = nullptr;
 	ID3D11Buffer *myBambooIndexBuffer = nullptr;
 	ID3D11Buffer *myTerrainIndexBuffer = nullptr;
+	ID3D11Buffer *myWaterIndexBuffer = nullptr;
 	ID3D11Buffer *myConstantBuffer = nullptr;
 	D3D11_VIEWPORT myPort;
 	D3D_DRIVER_TYPE myDriverType = D3D_DRIVER_TYPE_NULL;
@@ -46,6 +49,7 @@ class LetsDrawSomeStuff
 	ID3D11RasterizerState* myTempleRasterizerState = nullptr;
 	ID3D11RasterizerState* myBambooRasterizerState = nullptr;
 	ID3D11RasterizerState* myTerrainRasterizerState = nullptr;
+	ID3D11RasterizerState* myWaterRasterizerState = nullptr;
 	
 	ID3D11ShaderResourceView* noHeightShaderResource = nullptr;
 	ID3D11ShaderResourceView* skyboxShaderResource = nullptr;
@@ -62,6 +66,7 @@ class LetsDrawSomeStuff
 	ID3D11ShaderResourceView* templeNormalShaderResource = nullptr;
 	ID3D11ShaderResourceView* myBambooShaderResource = nullptr;
 	ID3D11ShaderResourceView* myTerrainShaderResource = nullptr;
+	ID3D11ShaderResourceView* myWaterShaderResource = nullptr;
 	ID3D11ShaderResourceView* myBlankShaderResource = nullptr;
 	ID3D11SamplerState* mySampler = nullptr;
 	
@@ -526,6 +531,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Create Pixel Shader
 			myDevice->CreatePixelShader(PixelShader_PPIV, sizeof(PixelShader_PPIV), nullptr, &myPixelShader);
 			myDevice->CreatePixelShader(LightPixelShader_PPIV, sizeof(LightPixelShader_PPIV), nullptr, &myLightPixelShader);
+			myDevice->CreatePixelShader(MultiTexturePixelShader_PPIV, sizeof(MultiTexturePixelShader_PPIV), nullptr, &myMultiTexturePixelShader);
 
 
 
@@ -720,6 +726,37 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Process the scene and build DirectX Arrays
 			ProcessFbxMesh(lScene->GetRootNode(), Terrain, terrainIndicies);
+
+			// Change the following filename to a suitable filename value.
+			lFilename = "Assets/water.fbx";
+
+			// Initialize the SDK manager. This object handles memory management.
+			lSdkManager = FbxManager::Create();
+
+			// Create the IO settings object.
+			ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
+			lSdkManager->SetIOSettings(ios);
+
+			// Create an importer using the SDK manager.
+			lImporter = FbxImporter::Create(lSdkManager, "");
+
+			// Use the first argument as the filename for the importer.
+			if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings())) {
+				printf("Call to FbxImporter::Initialize() failed.\n");
+				printf("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+				exit(-1);
+			}
+			// Create a new scene so that it can be populated by the imported file.
+			lScene = FbxScene::Create(lSdkManager, "myScene");
+
+			// Import the contents of the file into the scene.
+			lImporter->Import(lScene);
+
+			// The file is imported, so get rid of the importer.
+			lImporter->Destroy();
+
+			// Process the scene and build DirectX Arrays
+			ProcessFbxMesh(lScene->GetRootNode(), Water, waterIndicies);
 			
 
 			//Create Input Layout
@@ -770,6 +807,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			hr = myDevice->CreateRasterizerState(&rDesc, &myTempleRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myBambooRasterizerState);
 			hr = myDevice->CreateRasterizerState(&rDesc, &myTerrainRasterizerState);
+			hr = myDevice->CreateRasterizerState(&rDesc, &myWaterRasterizerState);
 
 
 			//Vertex Planet Buffer
@@ -880,6 +918,24 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			subData.pSysMem = terrainIndicies.data();
 			myDevice->CreateBuffer(&bDesc, &subData, &myTerrainIndexBuffer);
 
+			//Vertex Terrain Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(Vertex) * Water.size();
+			bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			bDesc.MiscFlags = 0;
+			bDesc.StructureByteStride = 0;
+			subData.pSysMem = Water.data();
+			hr = myDevice->CreateBuffer(&bDesc, &subData, &myWaterVertexBuffer);
+
+			//Index Water Buffer
+			bDesc.Usage = D3D11_USAGE_DEFAULT;
+			bDesc.ByteWidth = sizeof(unsigned int) * waterIndicies.size();
+			bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			bDesc.CPUAccessFlags = 0;
+			subData.pSysMem = waterIndicies.data();
+			myDevice->CreateBuffer(&bDesc, &subData, &myWaterIndexBuffer);
+
 			//Constant Buffer
 			bDesc.Usage = D3D11_USAGE_DEFAULT;
 			bDesc.ByteWidth = sizeof(ConstantBuffer);
@@ -924,9 +980,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			//Bamboo
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/bambooTexture.dds", nullptr, &myBambooShaderResource);
-			
+
 			//Terrain
 			hr = CreateDDSTextureFromFile(myDevice, L"Assets/terrainTexture.dds", nullptr, &myTerrainShaderResource);
+
+			//Water
+			hr = CreateDDSTextureFromFile(myDevice, L"Assets/waterTexture.dds", nullptr, &myWaterShaderResource);
 
 			// Create the sample state
 			D3D11_SAMPLER_DESC sampDesc = {};
@@ -990,6 +1049,7 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	noHeightShaderResource->Release();
 	myBlankShaderResource->Release();
 	myVertexWaterShader->Release();
+	myMultiTexturePixelShader->Release();
 
 	//Vertex Releases
 	myVertexShader->Release();
@@ -1043,13 +1103,18 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myBambooIndexBuffer->Release();
 	myBambooShaderResource->Release();
 	myBambooRasterizerState->Release();
-	
 
 	//Terrain Releases
 	myTerrainVertexBuffer->Release();
 	myTerrainIndexBuffer->Release();
 	myTerrainShaderResource->Release();
 	myTerrainRasterizerState->Release();
+
+	//Terrain Releases
+	myWaterVertexBuffer->Release();
+	myWaterIndexBuffer->Release();
+	myWaterShaderResource->Release();
+	myWaterRasterizerState->Release();
 
 	// TODO: "Release()" more stuff here!
 	//delete &WorldMatrix;
@@ -1060,7 +1125,8 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		mySurface->DecrementCount(); // reduce internal count (will auto delete on Zero)
 		mySurface = nullptr; // the safest way to fly
 	}
-	debugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	//debugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	debugDevice->Release();
 }
 
 // Draw
@@ -1103,12 +1169,14 @@ void LetsDrawSomeStuff::Render()
 			{
 				static ULONGLONG timeStart = 0;
 				ULONGLONG timeCur = GetTickCount64();
-				timer = timeCur;
 				if (timeStart == 0)
 					timeStart = timeCur;
 				curDeg = (timeCur - timeStart) / 1000.0f;
+				timer = (timeCur - timeStart) / 1000.0f;
+				if (timer >= 360) {
+					timer = timer;
+				}
 			}
-
 			if (GetAsyncKeyState('2')&0x1) {
 				sceneToggle = !(sceneToggle);
 				curDeg = 0;
@@ -1644,6 +1712,11 @@ void LetsDrawSomeStuff::Render()
 					Up = upPrime;
 				}
 #endif //1
+				XMFLOAT4 lightDir = { -0.25f, 0.0f, 0.0f, 1.0f };
+				XMMATRIX RotateLight = XMMatrixRotationY(1.0f*curDeg);
+				XMVECTOR LightVec = XMLoadFloat4(&lightDir);
+				LightVec = XMVector3Transform(LightVec, RotateLight);
+				XMStoreFloat4(&lightDir, LightVec);
 
 				viewMatrix = XMMatrixLookAtLH(Eye, Focus, Up);
 
@@ -1659,9 +1732,9 @@ void LetsDrawSomeStuff::Render()
 				constBuff1.cView = XMMatrixTranspose(viewMatrix);
 				constBuff1.cProjection = XMMatrixTranspose(projectionMatrix);
 				constBuff1.cRotateY = XMMatrixRotationY(0.0f);
-				constBuff1.cLightPos = XMFLOAT4{ 0.1f, 0.1f, 0.1f, 1.0f };
-				constBuff1.cLightDir = XMFLOAT4{ 0.1f, 0.1f, 1.0f, 1.0f };
-				constBuff1.cLightColor = XMFLOAT4{ 1,1,1,1 };
+				constBuff1.cLightPos = XMFLOAT4{ 0.0f, 1.0f, -5.0f, 1.0f };
+				constBuff1.cLightDir = lightDir;//XMFLOAT4{ -0.25f, 0.0f, 0.0f, 1.0f };
+				constBuff1.cLightColor = XMFLOAT4{ 0.94f, 0.91f, 0.65f, 1.0f };
 				constBuff1.cFloatScale = 1.0f;
 				constBuff1.cRange = 50.0f;
 				constBuff1.cTime = timer;
@@ -1701,7 +1774,7 @@ void LetsDrawSomeStuff::Render()
 				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
 				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
 
-				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShader(myMultiTexturePixelShader, nullptr, 0);
 				myContext->PSSetShaderResources(0, 1, &templeColorShaderResource);
 				myContext->PSSetShaderResources(1, 1, &templeRoughShaderResource);
 				myContext->PSSetShaderResources(2, 1, &templeNormalShaderResource);
@@ -1732,6 +1805,7 @@ void LetsDrawSomeStuff::Render()
 
 					//Change Constant Buffer
 					constBuff1.cWorld = XMMatrixTranspose(bambooMatrix);
+					constBuff1.cLightColor = XMFLOAT4{ 1,1,1,1 };
 
 					//Update Constant Buffer
 					myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
@@ -1802,16 +1876,18 @@ void LetsDrawSomeStuff::Render()
 					myContext->DrawIndexed(bambooIndicies.size(), 0, 0);
 				}
 
-			/////////////////////////
-			//TODO: Render Terrain//
-			///////////////////////
+				/////////////////////////
+				//TODO: Render Terrain//
+				///////////////////////
 
 				UINT terrainStrides[] = { sizeof(Vertex) };
 				UINT terrainOffsets[] = { 0 };
 				ID3D11Buffer *terrainTempVB[] = { myTerrainVertexBuffer };
 
 				XMMATRIX terrainMatrix = XMMatrixIdentity();
-				terrainMatrix = XMMatrixMultiply(XMMatrixScaling(0.25f,0.25f,0.25f), terrainMatrix);
+				terrainMatrix = XMMatrixMultiply(XMMatrixScaling(0.25f, 0.25f, 0.25f), terrainMatrix);
+				terrainMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(180.0f)), terrainMatrix);
+				terrainMatrix = XMMatrixMultiply(terrainMatrix, XMMatrixTranslation(0.0f,0.0f, -10.0f));
 
 				//Set Vertex Buffer
 				myContext->IASetVertexBuffers(0, 1, terrainTempVB, terrainStrides, terrainOffsets);
@@ -1828,7 +1904,7 @@ void LetsDrawSomeStuff::Render()
 
 				//Set Vertex Shader and Vertex Constant Buffer
 				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
-				myContext->VSSetShader(myVertexWaterShader, nullptr, 0);
+				myContext->VSSetShader(myVertexLightShader, nullptr, 0);
 				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
 				myContext->VSSetSamplers(0, 1, &mySampler);
 
@@ -1843,6 +1919,50 @@ void LetsDrawSomeStuff::Render()
 
 				//Draw Temple
 				myContext->DrawIndexed(terrainIndicies.size(), 0, 0);
+
+			///////////////////////
+			//TODO: Render Water//
+			/////////////////////
+
+				UINT waterStrides[] = { sizeof(Vertex) };
+				UINT waterOffsets[] = { 0 };
+				ID3D11Buffer *waterTempVB[] = { myWaterVertexBuffer };
+
+				XMMATRIX waterMatrix = XMMatrixIdentity();
+				waterMatrix = XMMatrixMultiply(XMMatrixScaling(0.15f, 0.15f, 0.15f), waterMatrix);
+				waterMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(90.0f)), waterMatrix);
+				waterMatrix = XMMatrixMultiply(waterMatrix, XMMatrixTranslation(0.0f, -0.5f, -25.0f));
+
+				//Set Vertex Buffer
+				myContext->IASetVertexBuffers(0, 1, waterTempVB, waterStrides, waterOffsets);
+
+				//Set Index Buffer
+				myContext->IASetIndexBuffer(myWaterIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				myContext->RSSetState(myWaterRasterizerState);
+
+				//Change Constant Buffer
+				constBuff1.cWorld = XMMatrixTranspose(waterMatrix);
+
+				//Update Constant Buffer
+				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
+
+				//Set Vertex Shader and Vertex Constant Buffer
+				myContext->VSSetConstantBuffers(0, 1, &myConstantBuffer);
+				myContext->VSSetShader(myVertexWaterShader, nullptr, 0);
+				myContext->VSSetShaderResources(0, 1, &noHeightShaderResource);
+				myContext->VSSetSamplers(0, 1, &mySampler);
+
+				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
+				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
+
+				myContext->PSSetShader(myLightPixelShader, nullptr, 0);
+				myContext->PSSetShaderResources(0, 1, &myWaterShaderResource);
+				myContext->PSSetShaderResources(1, 1, &myBlankShaderResource);
+				myContext->PSSetShaderResources(2, 1, &myBlankShaderResource);
+				myContext->PSSetSamplers(0, 1, &mySampler);
+
+				//Draw Temple
+				myContext->DrawIndexed(waterIndicies.size(), 0, 0);
 
 			}
 #endif //2

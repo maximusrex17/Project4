@@ -47,13 +47,13 @@ float4 main(OutputVertex InputPixel) : SV_TARGET //System Value
 	TBN[1] = InputPixel.biTangent.xyz;
 	TBN[2] = InputPixel.norm.xyz;
 
-	surfaceNorm.xyz = mul(surfaceNorm.xyz, TBN);
+	//surfaceNorm.xyz = mul(surfaceNorm.xyz, TBN);
 
 	surfaceColor = txDiffuse.Sample(samLinear, InputPixel.uv);
 	roughColor = txRough.Sample(samLinear, InputPixel.uv);
 	lightDir = normalize(vsLightPos - InputPixel.wPos);
 	lightRatio = saturate(dot(lightDir.xyz, surfaceNorm.xyz));
-	lightRatio = saturate(lightRatio + roughColor);
+	lightRatio = saturate(lightRatio + 1.0f);
 	finalColor = (lightRatio * vsLightColor * surfaceColor);
 	return finalColor;
 	return surfaceNorm;
