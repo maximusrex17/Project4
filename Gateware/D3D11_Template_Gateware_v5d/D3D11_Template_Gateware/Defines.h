@@ -109,6 +109,7 @@ float scale = 1;
 bool sceneToggle = true;
 
 float ratio;
+float splitRatio;
 float oldRatio;
 
 
