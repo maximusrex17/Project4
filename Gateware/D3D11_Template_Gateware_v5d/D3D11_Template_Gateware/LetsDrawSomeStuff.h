@@ -7,6 +7,7 @@ class LetsDrawSomeStuff
 {
 	// variables here
 	GW::GRAPHICS::GDirectX11Surface* mySurface = nullptr;
+	GW::GRAPHICS::GDirectX11Surface* mySurfaceII = nullptr;
 	// Gettting these handles from GDirectX11Surface will increase their internal refrence counts, be sure to "Release()" them when done!
 	ID3D11Device *myDevice = nullptr;
 	IDXGISwapChain *mySwapChain = nullptr;
@@ -19,6 +20,7 @@ class LetsDrawSomeStuff
 	ID3D11VertexShader *myVertexWaterShader = nullptr;
 	ID3D11PixelShader *myPixelShader = nullptr;
 	ID3D11PixelShader *myLightPixelShader = nullptr;
+	ID3D11PixelShader *mySpotLightPixelShader = nullptr;
 	ID3D11PixelShader *myMultiTexturePixelShader = nullptr;
 	ID3D11Buffer *myVertexBuffer = nullptr;
 	ID3D11Buffer *myShipVertexBuffer = nullptr;
@@ -519,6 +521,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			mySurface->GetSwapchain((void**)&mySwapChain);
 			mySurface->GetContext((void**)&myContext);
 
+			mySurfaceII->GetAspectRatio(ratio);
+			// Grab handles to all DX11 base interfaces
+			mySurfaceII->GetDevice((void**)&myDevice);
+			mySurfaceII->GetSwapchain((void**)&mySwapChain);
+			mySurfaceII->GetContext((void**)&myContext);
+
 			// TODO: Create new DirectX stuff here! (Buffers, Shaders, Layouts, Views, Textures, etc...)
 
 			
@@ -531,6 +539,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			//Create Pixel Shader
 			myDevice->CreatePixelShader(PixelShader_PPIV, sizeof(PixelShader_PPIV), nullptr, &myPixelShader);
 			myDevice->CreatePixelShader(LightPixelShader_PPIV, sizeof(LightPixelShader_PPIV), nullptr, &myLightPixelShader);
+			myDevice->CreatePixelShader(SpotLightPixelShader_PPIV, sizeof(SpotLightPixelShader_PPIV), nullptr, &mySpotLightPixelShader);
 			myDevice->CreatePixelShader(MultiTexturePixelShader_PPIV, sizeof(MultiTexturePixelShader_PPIV), nullptr, &myMultiTexturePixelShader);
 
 
@@ -1058,7 +1067,8 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	//Pixel Releases
 	myPixelShader->Release();
 	myLightPixelShader->Release();
-
+	mySpotLightPixelShader->Release();
+	
 	//Earth Releases
 	earthShaderResource->Release();
 	earthHeightShaderResource->Release();
@@ -1712,8 +1722,8 @@ void LetsDrawSomeStuff::Render()
 					Up = upPrime;
 				}
 #endif //1
-				XMFLOAT4 lightDir = { -0.25f, 0.0f, 0.0f, 1.0f };
-				XMMATRIX RotateLight = XMMatrixRotationY(1.0f*curDeg);
+				XMFLOAT4 lightDir = { 0.0, 0.0f, 1.0f, 1.0f };
+				XMMATRIX RotateLight = XMMatrixRotationX(1.0f*curDeg);
 				XMVECTOR LightVec = XMLoadFloat4(&lightDir);
 				LightVec = XMVector3Transform(LightVec, RotateLight);
 				XMStoreFloat4(&lightDir, LightVec);
@@ -1744,6 +1754,19 @@ void LetsDrawSomeStuff::Render()
 			//TODO: Render Temple//
 			//////////////////////
 
+				if (GetAsyncKeyState(VK_UP)) {
+					lightPos.y += 0.1f;
+				}
+				if (GetAsyncKeyState(VK_DOWN)) {
+					lightPos.y -= 0.1f;
+				}
+				if (GetAsyncKeyState(VK_LEFT)) {
+					lightPos.x -= 0.1f;
+				}
+				if (GetAsyncKeyState(VK_RIGHT)) {
+					lightPos.x += 0.1f;
+				}
+
 				UINT templeStrides[] = { sizeof(Vertex) };
 				UINT templeOffsets[] = { 0 };
 				ID3D11Buffer *templeTempVB[] = { myTempleVertexBuffer };
@@ -1761,6 +1784,11 @@ void LetsDrawSomeStuff::Render()
 
 				//Change Constant Buffer
 				constBuff1.cWorld = XMMatrixTranspose(templeMatrix);
+				constBuff1.cLightDir = XMFLOAT4{ 0.0f,0.0f,1.0f,1 };
+				constBuff1.cLightPos = lightPos;
+				constBuff1.cLightColor = XMFLOAT4{ 0.6f,0.5f,0.4f,1.0f };
+
+				constBuff1.cRange = 50.0f;
 
 				//Update Constant Buffer
 				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
@@ -1774,7 +1802,7 @@ void LetsDrawSomeStuff::Render()
 				//Set Pixel Shader, Pixel Constant Buffer, Shader Resource and Samplers
 				myContext->PSSetConstantBuffers(0, 1, &myConstantBuffer);
 
-				myContext->PSSetShader(myMultiTexturePixelShader, nullptr, 0);
+				myContext->PSSetShader(mySpotLightPixelShader, nullptr, 0);
 				myContext->PSSetShaderResources(0, 1, &templeColorShaderResource);
 				myContext->PSSetShaderResources(1, 1, &templeRoughShaderResource);
 				myContext->PSSetShaderResources(2, 1, &templeNormalShaderResource);
@@ -1898,6 +1926,7 @@ void LetsDrawSomeStuff::Render()
 
 				//Change Constant Buffer
 				constBuff1.cWorld = XMMatrixTranspose(terrainMatrix);
+				constBuff1.cRange = 25.0f;
 
 				//Update Constant Buffer
 				myContext->UpdateSubresource(myConstantBuffer, 0, nullptr, &constBuff1, 0, 0);
@@ -1930,7 +1959,7 @@ void LetsDrawSomeStuff::Render()
 
 				XMMATRIX waterMatrix = XMMatrixIdentity();
 				waterMatrix = XMMatrixMultiply(XMMatrixScaling(0.15f, 0.15f, 0.15f), waterMatrix);
-				waterMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(90.0f)), waterMatrix);
+				waterMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(180.0f)), waterMatrix);
 				waterMatrix = XMMatrixMultiply(waterMatrix, XMMatrixTranslation(0.0f, -0.5f, -25.0f));
 
 				//Set Vertex Buffer

@@ -9,6 +9,7 @@
 #include"LightVertexShader_PPIV.csh"
 #include"WaterVertexShader_PPIV.csh"
 #include"LightPixelShader_PPIV.csh"
+#include"SpotLightPixelShader_PPIV.csh"
 #include"MultiTexturePixelShader_PPIV.csh"
 #include "VertexShader.h"
 #include <directxmath.h>
@@ -23,6 +24,7 @@ using namespace DirectX;
 
 #define RAND_NORMAL XMFLOAT3(rand()/float(RAND_MAX),rand()/float(RAND_MAX),rand()/float(RAND_MAX))
 #define _DEGBUG
+#define SAFE_RELEASE(ptr) {if(ptr) {ptr->Release(); ptr = nullptr;}}
 
 struct Vertex {
 	float pos[4];
@@ -98,6 +100,7 @@ XMVECTOR camDiffX;
 XMFLOAT4 camAngleX;
 XMVECTOR camDiffY;
 XMFLOAT4 camAngleY;
+XMFLOAT4 lightPos = { 0,10,-25,1 };
 
 float timer = 0;
 

@@ -65,6 +65,7 @@
     <FxCompile Include="LightPixelShader_PPIV.hlsl" />
     <FxCompile Include="WaterVertexShader_PPIV.hlsl" />
     <FxCompile Include="MultiTexturePixelShader_PPIV.hlsl" />
+    <FxCompile Include="SpotLightPixelShader_PPIV.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\planet.fbx" />
