@@ -521,12 +521,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			mySurface->GetSwapchain((void**)&mySwapChain);
 			mySurface->GetContext((void**)&myContext);
 
-			mySurfaceII->GetAspectRatio(ratio);
-			// Grab handles to all DX11 base interfaces
-			mySurfaceII->GetDevice((void**)&myDevice);
-			mySurfaceII->GetSwapchain((void**)&mySwapChain);
-			mySurfaceII->GetContext((void**)&myContext);
-
 			// TODO: Create new DirectX stuff here! (Buffers, Shaders, Layouts, Views, Textures, etc...)
 
 			
@@ -1649,12 +1643,13 @@ void LetsDrawSomeStuff::Render()
 				XMFLOAT4 eyeFloat, focusFloat;
 				XMStoreFloat4(&focusFloat, Focus);
 				XMStoreFloat4(&eyeFloat, Eye);
-
+				
 				//W Key: Forward
 				if (GetAsyncKeyState('W')) {
 					eyeFloat.z += 0.01f;
 					focusFloat.z += 0.01f;
 				}
+
 
 				//A Key: Left
 				if (GetAsyncKeyState('A')) {
@@ -1771,7 +1766,7 @@ void LetsDrawSomeStuff::Render()
 				UINT templeOffsets[] = { 0 };
 				ID3D11Buffer *templeTempVB[] = { myTempleVertexBuffer };
 
-				XMMATRIX templeMatrix = XMMatrixIdentity();
+				XMMATRIX templeMatrix = XMMatrixTranslation(1.0f, 2.0f, 3.0f);//XMMatrixIdentity();
 				templeMatrix = XMMatrixMultiply(XMMatrixRotationY(XMConvertToRadians(180.0f)), templeMatrix);
 				templeMatrix = XMMatrixMultiply(XMMatrixRotationX(XMConvertToRadians(-90.0f)), templeMatrix);
 
